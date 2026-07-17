@@ -1,0 +1,54 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency-group: "pages"
+    concurrency-cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.124.1'
+          extended: true
+
+      - name: Cache Hugo resources
+        uses: actions/cache@v4
+        with:
+          path: |
+            resources/_gen
+            public
+          key: ${{ runner.os }}-hugocache-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-hugocache-
+
+      - name: Build
+        run: hugo --minify --gc --cleanDestinationDir
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ybq-me
+          directory: public
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          # 可选：自动处理 PR 预览
+          # wranglerVersion: '3'
+          # deploymentEnv: production
