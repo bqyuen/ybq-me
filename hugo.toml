@@ -1,0 +1,93 @@
+baseURL = "https://ybq.me/"
+defaultContentLanguage = "zh-cn"
+title = "ybq.me"
+theme = "PaperMod"
+timeZone = "Asia/Shanghai"
+
+[language]
+  [language.zh-cn]
+    locale = "zh-CN"
+    languageDirection = "ltr"
+    weight = 1
+
+# 输出中文友好的 URL
+[pagination]
+  pagerSize = 10
+
+[params]
+  env = "production"
+  description = "Gary 的认知游乐场 · 思维模型 / AI 学习 / 管理实战 / 决策洞察"
+  author = "Gary"
+  keywords = ["终身学习", "思维模型", "AI", "ybq.me"]
+  DateFormat = "2006-01-02"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  # 注意：PaperMod 模板读取的参数名是 ShareButtons（不是 ShowShareButtons）
+  # 空数组 = 关闭所有社交分享图标；完全注释掉这行 = 显示全部默认图标
+  ShareButtons = []
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowRssButtonInSectionTermList = true
+  disableSpecial1stPost = true
+  disableScrollToTop = false
+  # 评论系统：使用 Giscus（需安装 GitHub App 到 bqyuen/ybq-me，详见 comments.html）
+  comments = true
+  hidemeta = false
+  hideSummary = false
+  showtoc = true
+  tocopen = false
+  mainSections = ["models", "ai-learning", "insights", "management", "daily"]
+
+  # ShowShareButtons 已修正为 ShareButtons = []，关闭所有社交分享图标
+
+# 导航菜单（五大内容支柱）
+[menu]
+  [[menu.main]]
+    name = "首页"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "🧠 思维模型"
+    url = "/models/"
+    weight = 2
+  [[menu.main]]
+    name = "🤖 AI 学习"
+    url = "/ai-learning/"
+    weight = 3
+  [[menu.main]]
+    name = "🏭 管理实战"
+    url = "/management/"
+    weight = 4
+  [[menu.main]]
+    name = "🎯 决策洞察"
+    url = "/insights/"
+    weight = 5
+  [[menu.main]]
+    name = "📅 每日核心"
+    url = "/daily/"
+    weight = 6
+  [[menu.main]]
+    name = "关于"
+    url = "/about/"
+    weight = 7
+
+# Markdown 配置
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = false
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    lineNumbersInTable = true
+    tabWidth = 2
+
+# 输出配置
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+  term = ["HTML"]

@@ -1,0 +1,114 @@
+/* 长文阅读体验优化 */
+.post-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.post-content p {
+  line-height: 1.85;
+  margin-bottom: 1.25em;
+  text-align: justify;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  line-height: 1.4;
+}
+
+.post-content ul,
+.post-content ol {
+  margin-bottom: 1.25em;
+  padding-left: 1.5em;
+}
+
+.post-content li {
+  margin-bottom: 0.5em;
+  line-height: 1.7;
+}
+
+.post-content blockquote {
+  margin: 1.5em 0;
+  padding: 1em 1.2em;
+  border-left: 4px solid var(--primary);
+  background: var(--code-bg);
+  border-radius: 0 6px 6px 0;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .post-content {
+    max-width: 100%;
+    padding: 0 4px;
+  }
+
+  .post-content p {
+    line-height: 1.8;
+    margin-bottom: 1.1em;
+  }
+}
+
+/* 评论区与正文分隔 */
+.post-footer {
+  margin-top: 3em;
+  padding-top: 2em;
+  border-top: 1px solid var(--border);
+}
+
+/* 首页工具箱卡片 */
+.toolbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+  margin: 1.4em 0 0.6em;
+}
+
+.toolbox-card {
+  display: block;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.toolbox-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary);
+}
+
+.toolbox-card,
+.toolbox-card:hover,
+.toolbox-card:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.toolbox-emoji {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.toolbox-name {
+  margin: 8px 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.toolbox-pitch {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--secondary);
+}
+
+.toolbox-latest {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 12.5px;
+  color: var(--tertiary);
+}
