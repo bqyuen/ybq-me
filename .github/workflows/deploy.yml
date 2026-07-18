@@ -12,8 +12,9 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    concurrency-group: "pages"
-    concurrency-cancel-in-progress: false
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
