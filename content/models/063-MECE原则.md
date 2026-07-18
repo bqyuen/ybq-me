@@ -28,6 +28,9 @@ cover:
 
 ---
 
+
+![一、极简定义](/images/diagrams/063-MECE原则/1.png)
+
 ## 二、核心机制
 
 ### 2.1 MECE的两个维度
