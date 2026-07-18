@@ -46,7 +46,7 @@ jobs:
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: e05beded5b02f2e211033aa57096a5fd
           projectName: ybq-me
           directory: public
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
