@@ -6,6 +6,11 @@ description: "把内部的长板与短板、外部的风口与风口浪尖同时
 tags: ["思维模型", "管理框架", "SWOT分析", "076"]
 category: "管理框架"
 aliases: ["/learn/076-SWOT分析/"]
+
+cover:
+    image: "/images/covers/076-SWOT分析.png"
+    alt: "SWOT分析"
+    caption: "把内部的长板与短板、外部的风口与风口浪尖同时看到——就可以画…"
 ---
 
 # 076. SWOT分析

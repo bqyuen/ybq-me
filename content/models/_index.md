@@ -3,6 +3,7 @@ title: "思维模型"
 description: "100 个跨学科认知工具 —— 把聪明人的思考方式，拆成你能直接用的卡片"
 layout: "list"
 aliases: ["/learn/"]
+
 ---
 
 ## 🧠 思维模型
