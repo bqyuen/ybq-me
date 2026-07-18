@@ -6,6 +6,11 @@ description: "计划、执行、检查、改进——持续转动的质量飞轮
 tags: ["思维模型", "执行效率", "PDCA循环", "077"]
 category: "执行效率"
 aliases: ["/learn/077-PDCA循环/"]
+
+cover:
+    image: "/images/covers/077-PDCA循环.png"
+    alt: "PDCA循环"
+    caption: "计划、执行、检查、改进——持续转动的质量飞轮。"
 ---
 
 # 077. PDCA循环

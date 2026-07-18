@@ -2,6 +2,7 @@
 title: "每日核心"
 description: "每天一篇核心知识沉淀 —— 跨工作区同步到这里的知识精华"
 aliases: ["/blog/daily/"]
+
 ---
 
 ## 📅 每日核心

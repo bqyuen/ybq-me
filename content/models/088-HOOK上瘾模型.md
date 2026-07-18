@@ -6,6 +6,11 @@ description: "触发 → 行动 → 多变的奖励 → 投入——让人持续
 tags: ["思维模型", "沟通影响", "HOOK上瘾模型", "088"]
 category: "沟通影响"
 aliases: ["/learn/088-HOOK上瘾模型/"]
+
+cover:
+    image: "/images/covers/088-HOOK上瘾模型.png"
+    alt: "HOOK上瘾模型"
+    caption: "触发 → 行动 → 多变的奖励 → 投入——让人持续回来的行…"
 ---
 
 # 088. HOOK上瘾模型
