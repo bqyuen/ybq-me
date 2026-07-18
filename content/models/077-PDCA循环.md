@@ -28,6 +28,9 @@ cover:
 
 ---
 
+
+![一、极简定义](/images/diagrams/077-PDCA循环/1.png)
+
 ## 二、核心机制
 
 ### 2.1 PDCA四步详解

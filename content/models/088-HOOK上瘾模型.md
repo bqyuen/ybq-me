@@ -23,6 +23,9 @@ cover:
 
 > Eyal 在《上瘾》中系统化 HOOK 模型，并区分"良性上瘾"vs"恶性上瘾"。
 
+
+![一、极简定义](/images/diagrams/088-HOOK上瘾模型/1.png)
+
 ## 二、核心机制
 
 ### 2.1 HOOK 四步详解
