@@ -33,6 +33,8 @@ robotsNoIndex: true
       </div>
     </header>
 
+    <div id="ta-error-banner" class="ta-error-banner" style="display:none"></div>
+
     <section class="ta-cards">
       <div class="ta-metric-card">
         <div class="ta-metric-label">今日消耗</div>
@@ -109,6 +111,10 @@ robotsNoIndex: true
 .ta-btn-danger{color:#c33;border-color:#fcc}
 .ta-btn-danger:hover{background:#fff0f0}
 .ta-error{margin-top:12px;padding:8px 12px;border-radius:6px;background:#fee;color:#c33;font-size:13px}
+
+.ta-error-banner{padding:14px 18px;border-radius:10px;background:#fff0f0;border:1px solid #fcc;color:#c33;font-size:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ta-error-banner debug{font-family:ui-monospace,monospace;font-size:12px;color:#933;word-break:break-all}
+.ta-error-banner-retry{padding:6px 12px;border:1px solid #c33;background:#fff;color:#c33;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0}
 
 .ta-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap}
 .ta-page-title{font-size:1.6rem;margin:0;color:var(--content,#333)}
@@ -237,23 +243,41 @@ robotsNoIndex: true
   });
 
   function loadData() {
+    hideError();
     return fetch(AI_EP, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'stats', key: state.key, days: state.days })
     })
     .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!r.ok) {
+        return r.text().then(function(t) {
+          throw new Error('HTTP ' + r.status + (t ? (': ' + t.substring(0, 200)) : ''));
+        });
+      }
       return r.json();
     })
     .then(function(data) {
+      if (data.error) throw new Error(data.error);
       state.data = data;
       return true;
     })
     .catch(function(err) {
       console.error('loadData error:', err);
+      showError('数据加载失败：' + err.message);
       return false;
     });
+  }
+
+  function showError(msg) {
+    var b = document.getElementById('ta-error-banner');
+    b.innerHTML = '<div><div><strong>⚠️ ' + msg.split(':')[0] + '</strong></div><div class="debug" style="margin-top:4px">' + msg + '</div></div>' +
+      '<button class="ta-error-banner-retry" onclick="location.reload()">重试</button>';
+    b.style.display = 'flex';
+  }
+  function hideError() {
+    var b = document.getElementById('ta-error-banner');
+    if (b) b.style.display = 'none';
   }
 
   function render() {
