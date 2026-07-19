@@ -2,18 +2,32 @@
 // 架构：RAG 简化版（关键词检索 + LLM 生成）
 // API Key 存于环境变量 MIMO_API_KEY，前端不可见
 //
-// 支持两种 action：
+// 支持的 action：
 //   - ask（默认）：基于全站索引 + 当前页上下文回答问题
 //   - suggest：基于当前页生成 3-5 个用户可能想问的问题
+//   - stats：返回 token 消耗统计（需 STATS_KEY 鉴权）
+//
+// Token 统计写入 KV（STATS_KV）：
+//   key = "YYYY-MM-DD"
+//   value = { ask: {count, prompt_tokens, completion_tokens},
+//             suggest: {count, prompt_tokens, completion_tokens} }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders(env.ALLOWED_ORIGIN) });
     }
 
-    // 只允许 POST
+    // GET：用于管理后台预检/健康检查
+    if (request.method === 'GET') {
+      const url = new URL(request.url);
+      if (url.pathname === '/health') {
+        return jsonResponse({ ok: true, ts: Date.now() });
+      }
+      return jsonResponse({ error: 'Method not allowed' }, 405);
+    }
+
     if (request.method !== 'POST') {
       return jsonResponse({ error: 'Method not allowed' }, 405);
     }
@@ -23,9 +37,12 @@ export default {
       const action = body.action || 'ask';
 
       if (action === 'suggest') {
-        return await handleSuggest(body, env);
+        return await handleSuggest(body, env, ctx);
       }
-      return await handleAsk(body, env);
+      if (action === 'stats') {
+        return await handleStats(body, env, ctx);
+      }
+      return await handleAsk(body, env, ctx);
     } catch (err) {
       console.error('Worker error:', err);
       return jsonResponse({ error: '服务内部错误' }, 500);
@@ -35,7 +52,7 @@ export default {
 
 
 // === action=ask：回答用户问题 ===
-async function handleAsk(body, env) {
+async function handleAsk(body, env, ctx) {
   const { question, history = [], pageContext = null } = body;
 
   if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -45,7 +62,6 @@ async function handleAsk(body, env) {
     return jsonResponse({ error: '问题过长，请精简到 500 字以内' }, 400);
   }
 
-  // Step 1: 获取站点索引（用于跨页面 RAG）
   const indexUrl = `${env.SITE_URL}/index.json`;
   const indexRes = await fetch(indexUrl);
   if (!indexRes.ok) {
@@ -53,13 +69,10 @@ async function handleAsk(body, env) {
   }
   const articles = await indexRes.json();
 
-  // Step 2: 关键词检索 top-5 相关文章片段
   const relevant = findRelevant(question, articles, 5);
 
-  // Step 3: 构建 RAG prompt（含当前页上下文）
   const systemPrompt = buildSystemPrompt(relevant, pageContext);
 
-  // Step 4: 调 MiMo LLM
   const messages = [
     { role: 'system', content: systemPrompt },
     ...history.slice(-4).map(h => ({
@@ -95,7 +108,12 @@ async function handleAsk(body, env) {
   const llmData = await llmRes.json();
   const answer = llmData.choices?.[0]?.message?.content || '抱歉，无法生成回答。';
 
-  // Step 5: 返回答案 + 引用来源
+  // === 提取 usage 并异步写入 KV（用 ctx.waitUntil 保证请求返回后写入能完成） ===
+  const usage = llmData.usage || {};
+  if (ctx && ctx.waitUntil && env.STATS_KV) {
+    ctx.waitUntil(recordUsage(env, 'ask', usage.prompt_tokens || 0, usage.completion_tokens || 0));
+  }
+
   const sources = relevant.map(a => ({
     title: a.title,
     url: a.permalink,
@@ -107,11 +125,10 @@ async function handleAsk(body, env) {
 
 
 // === action=suggest：基于当前页生成用户可能想问的问题 ===
-async function handleSuggest(body, env) {
+async function handleSuggest(body, env, ctx) {
   const { pageContext = null } = body;
 
   if (!pageContext || !pageContext.title) {
-    // 没有当前页上下文：返回网站通用的引导问题
     return jsonResponse({
       suggestions: [
         '这个网站主要讲什么？',
@@ -122,7 +139,6 @@ async function handleSuggest(body, env) {
     }, 200, env.ALLOWED_ORIGIN);
   }
 
-  // 获取站点索引，做轻量 RAG（找到相关文章帮助生成更好的问题）
   let relatedContext = '';
   try {
     const indexUrl = `${env.SITE_URL}/index.json`;
@@ -132,9 +148,7 @@ async function handleSuggest(body, env) {
       const relevant = findRelevant(pageContext.title, articles, 3);
       relatedContext = relevant.map(a => `- ${a.title}`).join('\n');
     }
-  } catch (e) {
-    // 索引失败不阻断，降级到只用当前页上下文
-  }
+  } catch (e) { /* 索引失败不阻断 */ }
 
   const systemPrompt = `你是 ybq.me 网站的 AI 助手。基于用户当前正在浏览的页面内容，推测用户可能想问的问题。
 
@@ -175,7 +189,6 @@ ${relatedContext ? '## 网站相关文章\n' + relatedContext : ''}
   });
 
   if (!llmRes.ok) {
-    // 降级：返回通用问题
     return jsonResponse({
       suggestions: [
         `什么是「${pageContext.title}」？`,
@@ -189,14 +202,19 @@ ${relatedContext ? '## 网站相关文章\n' + relatedContext : ''}
   const llmData = await llmRes.json();
   const raw = llmData.choices?.[0]?.message?.content || '';
 
-  // 解析 LLM 输出：按行切分、清理、去重、限 4 个
+  // === 提取 usage 并异步写入 KV ===
+  const usage = llmData.usage || {};
+  if (ctx && ctx.waitUntil && env.STATS_KV) {
+    ctx.waitUntil(recordUsage(env, 'suggest', usage.prompt_tokens || 0, usage.completion_tokens || 0));
+  }
+
   const suggestions = raw
     .split('\n')
     .map(s => s.trim())
-    .map(s => s.replace(/^[\d]+[.、\)\s]+/, '').trim())  // 去掉前缀编号
-    .map(s => s.replace(/^[「""']+/, '').replace(/[」""']+$/, ''))  // 去引号
+    .map(s => s.replace(/^[\d]+[.、\)\s]+/, '').trim())
+    .map(s => s.replace(/^[「""']+/, '').replace(/[」""']+$/, ''))
     .filter(s => s.length > 2 && s.length <= 50)
-    .filter((s, i, arr) => arr.indexOf(s) === i)  // 去重
+    .filter((s, i, arr) => arr.indexOf(s) === i)
     .slice(0, 4);
 
   if (suggestions.length === 0) {
@@ -212,9 +230,113 @@ ${relatedContext ? '## 网站相关文章\n' + relatedContext : ''}
 }
 
 
-// === 辅助函数 ===
+// === action=stats：返回 token 消耗统计（需鉴权） ===
+async function handleStats(body, env, ctx) {
+  const key = body.key || '';
+  if (!env.STATS_KEY || key !== env.STATS_KEY) {
+    return jsonResponse({ error: '未授权' }, 401);
+  }
 
-// 关键词检索：中文分词 + TF 评分
+  const today = new Date().toISOString().slice(0, 10);
+  const days = body.days || 30;
+
+  // 拉取最近 N 天的数据
+  const keys = [];
+  for (let i = 0; i < days; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    keys.push(d.toISOString().slice(0, 10));
+  }
+
+  const results = await Promise.all(keys.map(async k => {
+    const v = await env.STATS_KV.get(k);
+    return { date: k, data: v ? JSON.parse(v) : null };
+  }));
+
+  // 聚合
+  const summary = {
+    today: aggregateDays(results.slice(0, 1)),
+    week: aggregateDays(results.slice(0, 7)),
+    month: aggregateDays(results.slice(0, 30)),
+    total: aggregateDays(results),
+  };
+
+  // 估算费用（MiMo Token Plan 单价：¥0.0001/1k token，可调）
+  const PRICE_PER_1K = 0.1;  // RMB
+  const cost = {
+    today_tokens: summary.today.total_tokens,
+    today_cost: (summary.today.total_tokens / 1000 * PRICE_PER_1K).toFixed(4),
+    week_tokens: summary.week.total_tokens,
+    week_cost: (summary.week.total_tokens / 1000 * PRICE_PER_1K).toFixed(4),
+    month_tokens: summary.month.total_tokens,
+    month_cost: (summary.month.total_tokens / 1000 * PRICE_PER_1K).toFixed(4),
+    total_tokens: summary.total.total_tokens,
+    total_cost: (summary.total.total_tokens / 1000 * PRICE_PER_1K).toFixed(4),
+    price_per_1k: PRICE_PER_1K,
+  };
+
+  return jsonResponse({
+    days: results.filter(r => r.data !== null).reverse(),  // 老 → 新
+    summary,
+    cost,
+    generated_at: new Date().toISOString(),
+  }, 200, env.ALLOWED_ORIGIN);
+}
+
+
+// === 统计辅助函数 ===
+
+// 写入每日 token 统计（KV 单调累加，避免并发覆盖）
+async function recordUsage(env, action, promptTokens, completionTokens) {
+  if (!env.STATS_KV) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const key = today;
+
+  // 读旧值
+  const prev = await env.STATS_KV.get(key);
+  let data = prev ? JSON.parse(prev) : {
+    ask: { count: 0, prompt_tokens: 0, completion_tokens: 0 },
+    suggest: { count: 0, prompt_tokens: 0, completion_tokens: 0 },
+  };
+
+  // 累加
+  if (!data[action]) data[action] = { count: 0, prompt_tokens: 0, completion_tokens: 0 };
+  data[action].count += 1;
+  data[action].prompt_tokens += promptTokens;
+  data[action].completion_tokens += completionTokens;
+
+  // 30 天 TTL，避免 KV 无限增长
+  await env.STATS_KV.put(key, JSON.stringify(data), { expirationTtl: 60 * 60 * 24 * 35 });
+}
+
+// 聚合多日数据
+function aggregateDays(days) {
+  const result = {
+    ask_count: 0,
+    suggest_count: 0,
+    ask_prompt_tokens: 0,
+    ask_completion_tokens: 0,
+    suggest_prompt_tokens: 0,
+    suggest_completion_tokens: 0,
+    total_tokens: 0,
+  };
+  for (const d of days) {
+    if (!d.data) continue;
+    result.ask_count += d.data.ask?.count || 0;
+    result.suggest_count += d.data.suggest?.count || 0;
+    result.ask_prompt_tokens += d.data.ask?.prompt_tokens || 0;
+    result.ask_completion_tokens += d.data.ask?.completion_tokens || 0;
+    result.suggest_prompt_tokens += d.data.suggest?.prompt_tokens || 0;
+    result.suggest_completion_tokens += d.data.suggest?.completion_tokens || 0;
+  }
+  result.total_tokens = result.ask_prompt_tokens + result.ask_completion_tokens
+                      + result.suggest_prompt_tokens + result.suggest_completion_tokens;
+  return result;
+}
+
+
+// === RAG 辅助函数 ===
+
 function findRelevant(query, articles, topK = 5) {
   const tokens = tokenize(query);
   if (tokens.length === 0) return articles.slice(0, topK);
@@ -223,14 +345,12 @@ function findRelevant(query, articles, topK = 5) {
     const text = `${article.title} ${article.summary || ''} ${(article.content || '').substring(0, 2000)}`;
     const textLower = text.toLowerCase();
     let score = 0;
-
     for (const token of tokens) {
       const t = token.toLowerCase();
       if (article.title.toLowerCase().includes(t)) score += 3;
       const count = (textLower.match(new RegExp(escapeRegex(t), 'g')) || []).length;
       score += Math.min(count, 5);
     }
-
     return { ...article, _score: score };
   });
 
@@ -243,14 +363,11 @@ function findRelevant(query, articles, topK = 5) {
 function tokenize(text) {
   const tokens = [];
   const segments = text.split(/[\s,，。！？、；：""''（）()\[\]【】\-\n]+/).filter(Boolean);
-
   for (const seg of segments) {
     if (/[\u4e00-\u9fff]/.test(seg)) {
       for (let i = 0; i < seg.length - 1; i++) {
         tokens.push(seg.substring(i, i + 2));
-        if (i < seg.length - 2) {
-          tokens.push(seg.substring(i, i + 3));
-        }
+        if (i < seg.length - 2) tokens.push(seg.substring(i, i + 3));
       }
       if (seg.length <= 8) tokens.push(seg);
     } else {

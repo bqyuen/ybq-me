@@ -8,5 +8,12 @@ LLM_MODEL = "mimo-v2.5"
 SITE_URL = "https://ybq.me"
 ALLOWED_ORIGIN = "https://ybq.me"
 
+# Token 消耗统计 KV
+# 2026-07-19 创建
+[[kv_namespaces]]
+binding = "STATS_KV"
+id = "83b6cb5fa539452399ef49c79bd62023"
+
 # MIMO_API_KEY 需要通过 `wrangler secret put MIMO_API_KEY` 设置
+# STATS_KEY 需要通过 `wrangler secret put STATS_KEY` 设置（管理后台访问密钥）
 # 不要写在这里，会暴露到版本控制
