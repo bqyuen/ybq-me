@@ -30,15 +30,17 @@ description: "输入你的学习目标，AI 规划专属阅读路径"
 <style>
 .learn-path-intro{margin-bottom:24px;line-height:1.8;color:var(--content,#333)}
 .learn-path-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.lp-btn{padding:8px 16px;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--primary,#fff);color:var(--content,#333);cursor:pointer;font-size:14px;transition:all .2s}
+/* 预设按钮：浅底深字（浅色）/ 深底浅字（深色） */
+.lp-btn{padding:8px 16px;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--theme,#fff);color:var(--content,#333);cursor:pointer;font-size:14px;transition:all .2s}
 .lp-btn:hover{border-color:var(--content,#333);background:var(--tertiary,#eee)}
 .learn-path-custom{display:flex;gap:8px;margin-bottom:24px}
-#learn-goal-input{flex:1;padding:12px 16px;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--primary,#fff);color:var(--content,#333);font-size:15px;outline:none}
+#learn-goal-input{flex:1;padding:12px 16px;border:1px solid var(--border,#ddd);border-radius:8px;background:var(--theme,#fff);color:var(--content,#333);font-size:15px;outline:none}
 #learn-goal-input:focus{border-color:var(--content,#333)}
-.lp-send-btn{padding:12px 24px;border:none;border-radius:8px;background:var(--content,#333);color:var(--primary,#fff);cursor:pointer;font-size:15px;font-weight:500;transition:opacity .2s}
+/* 发送按钮：深底浅字 */
+.lp-send-btn{padding:12px 24px;border:none;border-radius:8px;background:var(--content,#333);color:var(--theme,#fff);cursor:pointer;font-size:15px;font-weight:500;transition:opacity .2s}
 .lp-send-btn:hover{opacity:.85}
 .lp-send-btn:disabled{opacity:.5;cursor:not-allowed}
-#learn-path-result{padding:24px;border-radius:12px;background:var(--entry,#f8f8f8);border:1px solid var(--border,#eee)}
+#learn-path-result{padding:24px;border-radius:12px;background:var(--code-bg,#f8f8f8);border:1px solid var(--border,#eee)}
 #learn-path-content{line-height:1.9;font-size:15px;color:var(--content,#333)}
 #learn-path-content h3{margin-top:1.5rem;margin-bottom:.5rem;color:var(--content,#333)}
 #learn-path-content ol{padding-left:1.5rem}
