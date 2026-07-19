@@ -1,5 +1,5 @@
 {{- if .IsPage -}}
-{{- $slug := .File.BaseName -}}
+{{- $slug := .File.ContentBaseName -}}
 
 {{/* === 相关思维模型推荐 === */}}
 {{- $related := index .Site.Data.related $slug -}}
