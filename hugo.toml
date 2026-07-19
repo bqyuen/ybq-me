@@ -39,6 +39,20 @@ timeZone = "Asia/Shanghai"
   tocopen = false
   mainSections = ["models", "ai-learning", "insights", "management", "daily"]
 
+  [params.search]
+    enable = true
+    showResultCount = true
+    showSearch = true
+    fuseOpts = {
+      isCaseSensitive = false
+      shouldSort = true
+      location = 0
+      distance = 1000
+      threshold = 0.4
+      minMatchCharLength = 1
+      keys = ["title", "content", "tags", "categories"]
+    }
+
   # ShowShareButtons 已修正为 ShareButtons = []，关闭所有社交分享图标
 
 # 导航菜单（五大内容支柱）
@@ -68,9 +82,13 @@ timeZone = "Asia/Shanghai"
     url = "/daily/"
     weight = 6
   [[menu.main]]
+    name = "🔍 搜索"
+    url = "/search/"
+    weight = 7
+  [[menu.main]]
     name = "关于"
     url = "/about/"
-    weight = 7
+    weight = 8
 
 # Markdown 配置
 [markup]
