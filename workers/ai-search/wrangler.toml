@@ -1,0 +1,12 @@
+name = "ybq-ai-search"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+[vars]
+LLM_BASE_URL = "https://token-plan-cn.xiaomimimo.com/v1"
+LLM_MODEL = "mimo-v2.5"
+SITE_URL = "https://ybq.me"
+ALLOWED_ORIGIN = "https://ybq.me"
+
+# MIMO_API_KEY 需要通过 `wrangler secret put MIMO_API_KEY` 设置
+# 不要写在这里，会暴露到版本控制
