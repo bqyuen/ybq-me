@@ -2,6 +2,9 @@ name = "ybq-ai-search"
 main = "worker.js"
 compatibility_date = "2024-12-01"
 
+# 保留 workers.dev 子域名（让 Worker 可直接访问）
+workers_dev = true
+
 [vars]
 LLM_BASE_URL = "https://token-plan-cn.xiaomimimo.com/v1"
 LLM_MODEL = "mimo-v2.5"
