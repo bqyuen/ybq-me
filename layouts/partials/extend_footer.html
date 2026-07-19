@@ -1,0 +1,511 @@
+{{/* === 全局 AI 助手 widget（右下角悬浮 + 智能对话弹窗） === */}}
+{{- if not (eq .Layout "search") -}}
+
+<aside id="ai-assistant" aria-label="AI 助手" aria-hidden="true">
+  <button id="ai-assistant-fab" class="ai-fab" type="button" aria-label="打开 AI 助手" title="问我任何问题">
+    <span class="ai-fab-icon">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+        <line x1="9" y1="21" x2="15" y2="21"></line>
+      </svg>
+    </span>
+    <span class="ai-fab-badge" id="ai-fab-pulse"></span>
+  </button>
+
+  <section id="ai-assistant-panel" class="ai-panel" role="dialog" aria-labelledby="ai-panel-title" aria-modal="false">
+    <header class="ai-panel-header">
+      <div class="ai-panel-title-row">
+        <span class="ai-panel-avatar" aria-hidden="true">🤖</span>
+        <div class="ai-panel-title-text">
+          <h3 id="ai-panel-title">AI 助手</h3>
+          <span class="ai-panel-subtitle" id="ai-panel-status">问我任何关于本站的问题</span>
+        </div>
+      </div>
+      <div class="ai-panel-actions">
+        <button class="ai-icon-btn" id="ai-action-clear" type="button" title="清空对话" aria-label="清空对话">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+        <button class="ai-icon-btn" id="ai-action-close" type="button" title="关闭" aria-label="关闭">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="ai-panel-body" id="ai-panel-messages">
+      <div class="ai-msg ai-msg-welcome">
+        <div class="ai-msg-avatar">🤖</div>
+        <div class="ai-msg-bubble">
+          <p>你好！我是这个网站的 AI 助手。你正在浏览「<strong id="ai-current-page-title">{{ .Title }}</strong>」。</p>
+          <p class="ai-msg-hint">可以直接提问，或者从下方推荐问题开始 👇</p>
+        </div>
+      </div>
+      <div class="ai-suggestions" id="ai-suggestions" aria-live="polite">
+        <div class="ai-suggestions-loading">正在分析当前页面，准备推荐问题...</div>
+      </div>
+    </div>
+
+    <div class="ai-panel-context" id="ai-context-banner" aria-hidden="true">
+      <span class="ai-context-dot"></span>
+      <span class="ai-context-text">已感知当前页：<strong id="ai-context-page">{{ .Title }}</strong></span>
+    </div>
+
+    <footer class="ai-panel-footer">
+      <form id="ai-panel-form" class="ai-panel-input-row" autocomplete="off">
+        <textarea id="ai-panel-input" class="ai-panel-input" rows="1" placeholder="输入你的问题，回车发送..." maxlength="500"></textarea>
+        <button type="submit" id="ai-panel-send" class="ai-panel-send" aria-label="发送">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+      <div class="ai-panel-foot-hint">AI 可能出错，重要信息请查阅原文</div>
+    </footer>
+  </section>
+</aside>
+
+<style>
+/* === 悬浮按钮 === */
+.ai-fab{position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;border:none;background:var(--content,#333);color:var(--theme,#fff);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.12);transition:transform .2s ease,box-shadow .2s ease;z-index:9998;padding:0}
+.ai-fab:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 8px 26px rgba(0,0,0,.22),0 3px 8px rgba(0,0,0,.15)}
+.ai-fab:active{transform:translateY(0) scale(1)}
+.ai-fab-icon{display:flex;align-items:center;justify-content:center;line-height:0}
+.ai-fab-badge{position:absolute;top:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:#ff5a5a;border:2px solid var(--theme,#fff);opacity:0;animation:none}
+.ai-fab-badge.pulse{opacity:1;animation:aiPulse 2s ease-in-out infinite}
+@keyframes aiPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+
+/* === 助手面板 === */
+.ai-panel{position:fixed;right:24px;bottom:96px;width:min(400px,calc(100vw - 32px));max-height:min(640px,calc(100vh - 140px));background:var(--theme,#fff);color:var(--content,#333);border-radius:16px;border:1px solid var(--border,#e5e5e5);box-shadow:0 20px 60px rgba(0,0,0,.2),0 8px 20px rgba(0,0,0,.1);display:flex;flex-direction:column;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.96);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s;z-index:9999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
+.ai-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+
+/* === 面板头部 === */
+.ai-panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--code-bg,#f7f7f7);border-bottom:1px solid var(--border,#eee)}
+.ai-panel-title-row{display:flex;align-items:center;gap:10px;min-width:0}
+.ai-panel-avatar{font-size:22px;line-height:1;flex-shrink:0}
+.ai-panel-title-text{min-width:0}
+.ai-panel-title-text h3{margin:0;font-size:15px;font-weight:600;color:var(--content,#333);line-height:1.3}
+.ai-panel-subtitle{display:block;font-size:12px;color:var(--secondary,#888);margin-top:2px}
+.ai-panel-actions{display:flex;gap:4px;flex-shrink:0}
+.ai-icon-btn{width:30px;height:30px;border:none;background:transparent;color:var(--secondary,#666);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;padding:0}
+.ai-icon-btn:hover{background:var(--tertiary,#eee);color:var(--content,#333)}
+
+/* === 面板主体（消息流） === */
+.ai-panel-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-height:240px;scroll-behavior:smooth}
+.ai-panel-body::-webkit-scrollbar{width:6px}
+.ai-panel-body::-webkit-scrollbar-thumb{background:var(--tertiary,#ccc);border-radius:3px}
+
+/* === 消息气泡 === */
+.ai-msg{display:flex;gap:8px;align-items:flex-start;max-width:90%}
+.ai-msg-avatar{width:28px;height:28px;border-radius:50%;background:var(--code-bg,#eee);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ai-msg-bubble{padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6;color:var(--content,#333);word-wrap:break-word;overflow-wrap:break-word}
+.ai-msg-bubble p{margin:0 0 8px}
+.ai-msg-bubble p:last-child{margin-bottom:0}
+.ai-msg-bubble strong{font-weight:600}
+.ai-msg-bubble a{color:var(--content,#333);text-decoration:underline;word-break:break-all}
+.ai-msg-bubble code{background:var(--code-bg,#f0f0f0);padding:1px 5px;border-radius:3px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.ai-msg-welcome{flex-direction:column;max-width:100%}
+.ai-msg-welcome .ai-msg-bubble{background:var(--code-bg,#f7f7f7);margin-left:0;border-top-left-radius:4px}
+.ai-msg-hint{font-size:13px;color:var(--secondary,#888);margin-top:4px}
+
+.ai-msg-user{align-self:flex-end;flex-direction:row-reverse}
+.ai-msg-user .ai-msg-bubble{background:var(--content,#333);color:var(--theme,#fff);border-top-right-radius:4px}
+.ai-msg-user .ai-msg-bubble a{color:var(--theme,#fff)}
+
+.ai-msg-assistant .ai-msg-bubble{background:var(--code-bg,#f3f3f3);border-top-left-radius:4px}
+
+.ai-msg-loading .ai-msg-bubble{display:flex;align-items:center;gap:6px;color:var(--secondary,#888);font-size:13px}
+.ai-msg-error .ai-msg-bubble{background:#fff0f0;color:#c33;font-size:13px}
+
+.ai-typing-dots{display:inline-flex;gap:3px}
+.ai-typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--secondary,#aaa);animation:typingBounce 1.2s ease-in-out infinite}
+.ai-typing-dots span:nth-child(2){animation-delay:.15s}
+.ai-typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+
+/* === 推荐问题 === */
+.ai-suggestions{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.ai-suggestions-loading{padding:8px 4px;font-size:12px;color:var(--secondary,#999);text-align:center}
+.ai-suggestion-chip{padding:9px 14px;border-radius:10px;background:var(--theme,#fff);border:1px solid var(--border,#e0e0e0);color:var(--content,#333);cursor:pointer;font-size:13px;text-align:left;transition:all .15s;line-height:1.5;font-family:inherit}
+.ai-suggestion-chip:hover{border-color:var(--content,#333);background:var(--code-bg,#f5f5f5);transform:translateX(2px)}
+.ai-suggestion-chip::before{content:"💡 ";opacity:.7}
+
+/* === 来源 === */
+.ai-sources{margin-top:10px;padding-top:8px;border-top:1px solid var(--border,#e8e8e8)}
+.ai-sources-title{font-size:11px;color:var(--secondary,#999);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.ai-source-link{display:block;padding:4px 0;font-size:12px;color:var(--secondary,#666);text-decoration:none}
+.ai-source-link:hover{color:var(--content,#333);text-decoration:underline}
+.ai-source-link::before{content:"→ "}
+
+/* === 上下文感知 banner === */
+.ai-panel-context{padding:6px 16px;background:var(--code-bg,#f7f7f7);border-top:1px solid var(--border,#eee);font-size:11px;color:var(--secondary,#888);display:flex;align-items:center;gap:6px}
+.ai-panel-context[aria-hidden="true"]{display:none}
+.ai-context-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:contextPulse 2s ease-in-out infinite}
+@keyframes contextPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* === 输入区 === */
+.ai-panel-footer{border-top:1px solid var(--border,#eee);padding:10px 12px;background:var(--theme,#fff)}
+.ai-panel-input-row{display:flex;gap:8px;align-items:flex-end}
+.ai-panel-input{flex:1;border:1px solid var(--border,#ddd);border-radius:10px;padding:10px 12px;background:var(--theme,#fff);color:var(--content,#333);font-size:14px;font-family:inherit;line-height:1.4;resize:none;max-height:120px;outline:none;transition:border-color .15s;min-height:40px}
+.ai-panel-input:focus{border-color:var(--content,#333)}
+.ai-panel-input::placeholder{color:var(--secondary,#aaa)}
+.ai-panel-send{width:40px;height:40px;border:none;border-radius:10px;background:var(--content,#333);color:var(--theme,#fff);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s,transform .1s;flex-shrink:0;padding:0}
+.ai-panel-send:hover{opacity:.85}
+.ai-panel-send:active{transform:scale(.95)}
+.ai-panel-send:disabled{opacity:.4;cursor:not-allowed}
+.ai-panel-foot-hint{margin-top:6px;font-size:11px;color:var(--secondary,#aaa);text-align:center}
+
+/* === 移动端 === */
+@media screen and (max-width:600px){
+  .ai-fab{right:16px;bottom:16px;width:52px;height:52px}
+  .ai-panel{right:8px;left:8px;bottom:80px;width:auto;max-height:calc(100vh - 100px);border-radius:14px}
+  .ai-panel-body{min-height:200px}
+}
+
+/* === 减少动效偏好 === */
+@media (prefers-reduced-motion:reduce){
+  .ai-fab,.ai-panel,.ai-fab-badge,.ai-typing-dots span,.ai-context-dot{animation:none!important;transition:none!important}
+}
+
+/* === 深色主题微调 === */
+[data-theme="dark"] .ai-msg-error .ai-msg-bubble{background:#3a1a1a;color:#ff8888}
+[data-theme="dark"] .ai-suggestion-chip:hover{background:var(--tertiary,#3a3a3a)}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  var AI_ENDPOINT = 'https://ybq-ai-search.garyyuen.workers.dev';
+  var STORAGE_KEY = 'ybq_ai_assistant_history';
+  var MAX_HISTORY = 8;
+
+  // === 当前页上下文采集 ===
+  function getCurrentPageContext() {
+    var title = document.title || '';
+    // 去掉网站后缀
+    title = title.replace(/\s*[|\-·].*$/, '').trim();
+
+    // 取 meta description
+    var desc = '';
+    var metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) desc = metaDesc.getAttribute('content') || '';
+
+    // 取正文前 2000 字（去掉脚本、样式、导航等）
+    var content = '';
+    var article = document.querySelector('.post-content') || document.querySelector('article') || document.querySelector('main');
+    if (article) {
+      var clone = article.cloneNode(true);
+      clone.querySelectorAll('script,style,nav,aside,.ai-qa-section,.related-models,#ai-assistant,.comments').forEach(function(el){ el.remove(); });
+      content = (clone.innerText || '').replace(/\s+/g, ' ').trim().substring(0, 2000);
+    }
+
+    return {
+      title: title,
+      url: window.location.pathname,
+      summary: desc,
+      content: content
+    };
+  }
+
+  // === 状态 ===
+  var state = {
+    open: false,
+    history: [],
+    suggestionsLoaded: false,
+    suggestionsLoading: false,
+    pageContext: getCurrentPageContext(),
+    conversation: []  // [{role, content}]
+  };
+
+  // === DOM 引用 ===
+  var fab = document.getElementById('ai-assistant-fab');
+  var panel = document.getElementById('ai-assistant-panel');
+  var closeBtn = document.getElementById('ai-action-close');
+  var clearBtn = document.getElementById('ai-action-clear');
+  var form = document.getElementById('ai-panel-form');
+  var input = document.getElementById('ai-panel-input');
+  var sendBtn = document.getElementById('ai-panel-send');
+  var messagesEl = document.getElementById('ai-panel-messages');
+  var suggestionsEl = document.getElementById('ai-suggestions');
+  var statusEl = document.getElementById('ai-panel-status');
+  var contextBanner = document.getElementById('ai-context-banner');
+  var contextPageEl = document.getElementById('ai-context-page');
+  var welcomeTitleEl = document.getElementById('ai-current-page-title');
+  var fabBadge = document.getElementById('ai-fab-pulse');
+
+  // === 初始化当前页信息显示 ===
+  if (welcomeTitleEl) welcomeTitleEl.textContent = state.pageContext.title || '本站';
+  if (contextPageEl) contextPageEl.textContent = state.pageContext.title || '本站';
+  if (state.pageContext.title) {
+    contextBanner.setAttribute('aria-hidden', 'false');
+  }
+
+  // === 打开/关闭 ===
+  function openPanel() {
+    state.open = true;
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    fabBadge.classList.remove('pulse');
+    setTimeout(function(){ input.focus(); }, 200);
+    if (!state.suggestionsLoaded && !state.suggestionsLoading) {
+      loadSuggestions();
+    }
+    scrollToBottom();
+  }
+  function closePanel() {
+    state.open = false;
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+  function togglePanel() {
+    if (state.open) closePanel(); else openPanel();
+  }
+
+  fab.addEventListener('click', togglePanel);
+  closeBtn.addEventListener('click', closePanel);
+
+  // ESC 关闭
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && state.open) {
+      closePanel();
+    }
+    // Ctrl/Cmd + K 打开
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      if (!state.open) openPanel();
+    }
+  });
+
+  // === 清空对话 ===
+  clearBtn.addEventListener('click', function() {
+    state.conversation = [];
+    // 保留欢迎消息和推荐问题，删除其他消息
+    var allMsgs = messagesEl.querySelectorAll('.ai-msg');
+    allMsgs.forEach(function(m){
+      if (!m.classList.contains('ai-msg-welcome')) m.remove();
+    });
+    // 重新显示推荐问题（如果已加载）
+    if (state.suggestionsLoaded) {
+      suggestionsEl.style.display = '';
+    }
+  });
+
+  // === 输入框自适应高度 + 回车发送 ===
+  input.addEventListener('input', function() {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var q = input.value.trim();
+    if (!q) return;
+    askQuestion(q);
+  });
+
+  // === 加载推荐问题 ===
+  function loadSuggestions() {
+    state.suggestionsLoading = true;
+    suggestionsEl.innerHTML = '<div class="ai-suggestions-loading">正在分析当前页面，准备推荐问题...</div>';
+
+    fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'suggest',
+        pageContext: state.pageContext
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      state.suggestionsLoaded = true;
+      state.suggestionsLoading = false;
+      renderSuggestions(data.suggestions || []);
+    })
+    .catch(function() {
+      state.suggestionsLoading = false;
+      suggestionsEl.innerHTML = '<div class="ai-suggestions-loading" style="color:var(--secondary,#aaa)">推荐问题加载失败，可直接输入你的问题</div>';
+    });
+  }
+
+  function renderSuggestions(suggestions) {
+    if (!suggestions || suggestions.length === 0) {
+      suggestionsEl.innerHTML = '';
+      return;
+    }
+    suggestionsEl.innerHTML = suggestions.map(function(q) {
+      return '<button class="ai-suggestion-chip" type="button" data-q="' + escapeAttr(q) + '">' + escapeHtml(q) + '</button>';
+    }).join('');
+    suggestionsEl.querySelectorAll('.ai-suggestion-chip').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        askQuestion(btn.dataset.q);
+      });
+    });
+  }
+
+  // === 提问 ===
+  function askQuestion(question) {
+    // 隐藏推荐问题
+    suggestionsEl.style.display = 'none';
+
+    // 显示用户消息
+    appendMessage('user', question);
+
+    // 清空输入
+    input.value = '';
+    input.style.height = 'auto';
+
+    // 状态
+    statusEl.textContent = '思考中...';
+    sendBtn.disabled = true;
+
+    // loading 气泡
+    var loadingId = appendLoadingMessage();
+
+    fetch(AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'ask',
+        question: question,
+        history: state.conversation.slice(-MAX_HISTORY),
+        pageContext: state.pageContext
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      removeMessage(loadingId);
+      if (data.error) {
+        appendMessage('error', data.error);
+      } else {
+        appendMessage('assistant', data.answer, data.sources);
+        state.conversation.push({ role: 'user', content: question });
+        state.conversation.push({ role: 'assistant', content: data.answer });
+        if (state.conversation.length > MAX_HISTORY * 2) {
+          state.conversation = state.conversation.slice(-MAX_HISTORY * 2);
+        }
+      }
+    })
+    .catch(function() {
+      removeMessage(loadingId);
+      appendMessage('error', '网络错误，请稍后重试');
+    })
+    .finally(function() {
+      statusEl.textContent = '问我任何关于本站的问题';
+      sendBtn.disabled = false;
+      input.focus();
+    });
+  }
+
+  // === 消息渲染 ===
+  function appendMessage(role, content, sources) {
+    var div = document.createElement('div');
+    div.className = 'ai-msg ai-msg-' + role;
+    var id = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+    div.id = id;
+
+    var html = '';
+    if (role === 'user') {
+      html = '<div class="ai-msg-bubble">' + escapeHtml(content) + '</div>';
+    } else if (role === 'assistant') {
+      html = '<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble">' + formatAnswer(content);
+      if (sources && sources.length) {
+        html += '<div class="ai-sources"><div class="ai-sources-title">引用来源</div>' +
+          sources.map(function(s) {
+            return '<a class="ai-source-link" href="' + s.url + '" target="_blank" rel="noopener">' + escapeHtml(s.title) + '</a>';
+          }).join('') +
+          '</div>';
+      }
+      html += '</div>';
+    } else if (role === 'error') {
+      html = '<div class="ai-msg-avatar">⚠️</div><div class="ai-msg-bubble">' + escapeHtml(content) + '</div>';
+    }
+    div.innerHTML = html;
+    messagesEl.appendChild(div);
+    scrollToBottom();
+    return id;
+  }
+
+  function appendLoadingMessage() {
+    var div = document.createElement('div');
+    div.className = 'ai-msg ai-msg-loading';
+    var id = 'msg-loading-' + Date.now();
+    div.id = id;
+    div.innerHTML = '<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble"><span class="ai-typing-dots"><span></span><span></span><span></span></span></div>';
+    messagesEl.appendChild(div);
+    scrollToBottom();
+    return id;
+  }
+
+  function removeMessage(id) {
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function scrollToBottom() {
+    setTimeout(function() {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }, 50);
+  }
+
+  // === Markdown 极简格式化 ===
+  function formatAnswer(text) {
+    if (!text) return '';
+    var html = escapeHtml(text);
+    // **粗体**
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    // [文本](链接)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, txt, url) {
+      return '<a href="' + url + '" target="_blank" rel="noopener">' + txt + '</a>';
+    });
+    // 行内 `代码`
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // 换行 → 段落
+    var paragraphs = html.split(/\n{2,}/);
+    return paragraphs.map(function(p) {
+      p = p.replace(/\n/g, '<br>');
+      return '<p>' + p + '</p>';
+    }).join('');
+  }
+
+  // === 工具：HTML 转义 ===
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  function escapeAttr(s) {
+    return escapeHtml(s);
+  }
+
+  // === 首次访问 5 秒后，悬浮按钮徽章闪烁提醒 ===
+  var hasInteracted = sessionStorage.getItem('ybq_ai_opened');
+  if (!hasInteracted) {
+    setTimeout(function() {
+      if (!state.open) fabBadge.classList.add('pulse');
+    }, 5000);
+  }
+  fab.addEventListener('click', function() {
+    sessionStorage.setItem('ybq_ai_opened', '1');
+  }, { once: true });
+})();
+</script>
+
+{{- end -}}
