@@ -11,6 +11,7 @@ cover:
     image: "/images/covers/063-MECE原则.png"
     alt: "MECE原则"
     caption: "把问题切分成'不重叠、不遗漏'的碎片——你能看到完整的画面，…"
+summary: "MECE原则要求分析问题时分组相互独立且完全穷尽，确保全面无重复。"
 ---
 
 # 063. MECE原则

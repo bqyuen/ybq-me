@@ -11,6 +11,7 @@ cover:
     image: "/images/covers/077-PDCA循环.png"
     alt: "PDCA循环"
     caption: "计划、执行、检查、改进——持续转动的质量飞轮。"
+summary: "PDCA循环是通过计划、执行、检查、改进四步迭代实现持续改善的框架。"
 ---
 
 # 077. PDCA循环
