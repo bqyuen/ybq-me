@@ -4,10 +4,11 @@ layout: "single"
 description: "100 个思维模型之间的关联关系可视化"
 ---
 
-<div id="graph-container" style="width:100%;height:80vh;min-height:500px;border-radius:12px;background:var(--entry,#f8f8f8);position:relative;overflow:hidden;">
+<div id="graph-container" style="width:100%;height:80vh;min-height:500px;border-radius:12px;background:var(--code-bg,#f8f8f8);position:relative;overflow:hidden;">
   <div id="graph-loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--secondary,#999);font-size:16px;">加载中...</div>
 </div>
-<div id="graph-tooltip" style="display:none;position:fixed;padding:8px 12px;border-radius:8px;background:var(--content,#333);color:var(--primary,#fff);font-size:13px;pointer-events:none;z-index:100;max-width:200px;"></div>
+<!-- tooltip 强制使用黑底白字，不依赖主题变量，确保两种主题下都清晰 -->
+<div id="graph-tooltip" style="display:none;position:fixed;padding:8px 12px;border-radius:8px;background:#1a1a1a;color:#fff;font-size:13px;pointer-events:none;z-index:100;max-width:200px;box-shadow:0 2px 8px rgba(0,0,0,.25);"></div>
 
 <style>
 #graph-container svg { display: block; }

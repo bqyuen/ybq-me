@@ -1,6 +1,6 @@
 {{- if and (not .IsPage) (not .IsSection) -}}
 {{- else if .IsPage -}}
-{{- $slug := .File.BaseName -}}
+{{- $slug := .File.ContentBaseName -}}
 {{- $related := index .Site.Data.related $slug -}}
 {{- if $related -}}
 <section class="related-models">
