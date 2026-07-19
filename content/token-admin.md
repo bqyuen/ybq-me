@@ -2,7 +2,7 @@
 title: "Token 消耗统计"
 layout: "single"
 description: "AI 助手 Token 消耗管理后台"
-noindex: true
+robotsNoIndex: true
 ---
 
 <div id="token-admin-app">
