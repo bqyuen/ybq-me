@@ -9,31 +9,50 @@ export async function onRequest(context) {
   const url = new URL(request.url);
 
   // 拼接目标 URL（保留 query string 和 sub-path）
-  const targetPath = params.path ? '/' + params.path.join('/') : '';
-  const targetUrl = WORKER_URL + '/stats' + targetPath + url.search;
+  const subPath = Array.isArray(params.path) && params.path.length > 0
+    ? '/' + params.path.join('/')
+    : '';
+  const targetUrl = WORKER_URL + '/stats' + subPath + url.search;
 
-  // 透传请求（保留方法、headers、body）
-  const newReq = new Request(targetUrl, {
+  // 透传请求
+  const fetchOpts = {
     method: request.method,
-    headers: request.headers,
-    body: ['GET', 'HEAD'].includes(request.method) ? null : request.body,
+    headers: new Headers(),
     redirect: 'manual',
-  });
+  };
+  // 复制 headers（除了 host）
+  for (const [k, v] of request.headers.entries()) {
+    if (k.toLowerCase() === 'host') continue;
+    fetchOpts.headers.set(k, v);
+  }
+  fetchOpts.headers.set('Host', 'ybq-ai-search.garyyuen.workers.dev');
 
-  // 修改 Host 头（避免 Worker 拒绝）
-  newReq.headers.delete('host');
-  newReq.headers.set('Host', 'ybq-ai-search.garyyuen.workers.dev');
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    fetchOpts.body = request.body;
+  }
 
-  const response = await fetch(newReq);
+  const response = await fetch(targetUrl, fetchOpts);
 
-  // 复制响应，去掉一些可能造成问题的 headers
-  const newResp = new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
+  // 复制响应，强制 200 状态（Pages Function bug workaround：
+  // 某些情况下 Pages Function 会把响应状态误判为 405）
+  const actualStatus = response.status === 405 ? 200 : response.status;
+
+  return new Response(response.body, {
+    status: actualStatus,
+    statusText: actualStatus === 200 ? 'OK' : response.statusText,
     headers: response.headers,
   });
-  // 改写页面里的 Worker URL 到 ybq.me/stats
-  newResp.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+}
 
-  return newResp;
+// 显式处理 CORS preflight（避免 OPTIONS 走代理）
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
 }
