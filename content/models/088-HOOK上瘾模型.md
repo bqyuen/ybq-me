@@ -11,6 +11,7 @@ cover:
     image: "/images/covers/088-HOOK上瘾模型.png"
     alt: "HOOK上瘾模型"
     caption: "触发 → 行动 → 多变的奖励 → 投入——让人持续回来的行…"
+summary: "触发、行动、多变奖励、投入四步循环，形成用户持续使用的行为闭环。"
 ---
 
 # 088. HOOK上瘾模型

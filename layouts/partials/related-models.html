@@ -1,0 +1,25 @@
+{{- if and (not .IsPage) (not .IsSection) -}}
+{{- else if .IsPage -}}
+{{- $slug := .File.BaseName -}}
+{{- $related := index .Site.Data.related $slug -}}
+{{- if $related -}}
+<section class="related-models">
+  <h2 class="related-title">🔗 相关思维模型</h2>
+  <div class="related-grid">
+    {{- range $related }}
+    <a class="related-card" href="/models/{{ .slug }}/">
+      <span class="related-card-title">{{ .title }}</span>
+    </a>
+    {{- end }}
+  </div>
+</section>
+<style>
+.related-models{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border,#eee)}
+.related-title{font-size:1.2rem;margin-bottom:1rem;color:var(--content,#333)}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.related-card{display:block;padding:14px 18px;border-radius:10px;background:var(--entry,#f5f5f5);text-decoration:none;transition:all .2s;border:1px solid transparent}
+.related-card:hover{border-color:var(--primary,#333);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.related-card-title{font-size:14px;color:var(--content,#333);font-weight:500;line-height:1.5}
+</style>
+{{- end -}}
+{{- end -}}

@@ -11,6 +11,7 @@ cover:
     image: "/images/covers/076-SWOT分析.png"
     alt: "SWOT分析"
     caption: "把内部的长板与短板、外部的风口与风口浪尖同时看到——就可以画…"
+summary: "SWOT分析通过梳理内部优劣势与外部机会威胁，为战略决策提供结构化框架。"
 ---
 
 # 076. SWOT分析
