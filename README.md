@@ -8,10 +8,16 @@
 
 `ybq.me` 是 Gary 的个人网站，定位为**终身学习者的认知进化记录**。
 
-包含三大板块：
-- 📚 **终身学习** —— 103 个思维模型深度解读
-- ✍️ **博客** —— 行业洞察 / 思考 / 决策日志
-- 👤 **关于** —— 我是谁
+## 📚 内容导航
+
+| 板块 | 内容 | 入口 |
+|------|------|------|
+| 🧩 **思维模型** | 103 个思维模型深度解读，按十大类别组织（认知决策 / 系统战略 / 执行效率 / 沟通影响…） | [ybq.me/models](https://ybq.me/models/) |
+| 🤖 **AI 学习** | AI 实战方法论：刻意练习、半年成为领域专家 | [ybq.me/ai-learning](https://ybq.me/ai-learning/) |
+| 🏭 **管理实战** | 管理框架与落地实践 | [ybq.me/management](https://ybq.me/management/) |
+| 🔭 **决策洞察** | 行业观察与深度分析（如全球债务账本） | [ybq.me/insights](https://ybq.me/insights/) |
+| ☀️ **每日核心** | 每日思考与决策日志 | [ybq.me/daily](https://ybq.me/daily/) |
+| 👤 **关于我** | 我是谁 | [ybq.me/about](https://ybq.me/about/) |
 
 ## 🏗️ 技术栈
 
@@ -33,13 +39,11 @@ ybq-me/
 ├── content/                    # Markdown 内容
 │   ├── _index.md              # 首页
 │   ├── about.md               # 关于
-│   ├── learn/                 # 终身学习专栏
-│   │   ├── _index.md
-│   │   └── first-principles.md  # 思维模型 #001
-│   ├── blog/                  # 博客
-│   │   └── _index.md
-│   └── contact/               # 联系
-│       └── _index.md
+│   ├── models/                # 思维模型（目标 103 篇）
+│   ├── ai-learning/           # AI 学习
+│   ├── management/            # 管理实战
+│   ├── insights/              # 决策洞察
+│   └── daily/                 # 每日核心
 ├── themes/
 │   └── PaperMod/              # Hugo 主题（git submodule）
 ├── hugo.toml                  # Hugo 配置
@@ -61,7 +65,7 @@ ybq-me/
 
 ```bash
 # 1. 克隆仓库（含子模块）
-git clone --recurse-submodules https://github.com/garyyuen/ybq-me.git
+git clone --recurse-submodules https://github.com/bqyuen/ybq-me.git
 cd ybq-me
 
 # 2. 启动本地预览
@@ -74,10 +78,10 @@ hugo server -D
 
 ```bash
 # 思维模型文章
-hugo new learn/first-principles.md
+hugo new models/104-模型名.md
 
-# 博客文章
-hugo new blog/2026-07-20-hello-world.md
+# 洞察文章
+hugo new insights/2026-07-20-hello-world.md
 ```
 
 ### 部署到 Cloudflare Pages（5 分钟）
@@ -92,14 +96,14 @@ hugo new blog/2026-07-20-hello-world.md
    git add .
    git commit -m "init: ybq.me 初始骨架"
    # 在 GitHub 创建 ybq-me 仓库，然后：
-   git remote add origin https://github.com/garyyuen/ybq-me.git
+   git remote add origin https://github.com/bqyuen/ybq-me.git
    git branch -M main
    git push -u origin main
    ```
 
 2. **Cloudflare 控制台 → Workers & Pages → 创建应用**
    - 选择 **Pages** → **Connect to Git**
-   - 选择 `garyyuen/ybq-me` 仓库
+   - 选择 `bqyuen/ybq-me` 仓库
 
 3. **配置构建设置**
    - 构建命令：`hugo --minify`
@@ -146,16 +150,12 @@ hugo new blog/2026-07-20-hello-world.md
 
 ```
 ybq.me                        ← 首页（个人品牌 / Hero）
-├── /learn/                   ← 终身学习专栏
-│   ├── 思维模型 #001 第一性原理
-│   ├── 思维模型 #002 元认知
-│   └── ...（目标 103 篇）
-├── /blog/                    ← 博客
-│   ├── 制冷行业洞察
-│   ├── AI 实战
-│   └── 思维进化
-├── /about/                   ← 关于我
-└── /contact/                 ← 联系
+├── /models/                  ← 思维模型（目标 103 篇）
+├── /ai-learning/             ← AI 学习
+├── /management/              ← 管理实战
+├── /insights/                ← 决策洞察（行业观察 / 深度分析）
+├── /daily/                   ← 每日核心（思考与决策日志）
+└── /about/                   ← 关于我
 ```
 
 ## 🛠️ 维护节奏
