@@ -1,0 +1,134 @@
+{{- define "main" }}
+
+<header class="page-header models-hero">
+  {{- partial "breadcrumbs.html" . }}
+  <h1>
+    🧠 思维模型 · 100 个跨学科认知工具
+    {{- if .Param "ShowRssButtonInSectionTermList" }}
+    {{- with .OutputFormats.Get "rss" }}
+    <a href="{{ .RelPermalink }}" title="RSS" aria-label="RSS">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" height="23">
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    </a>
+    {{- end }}
+    {{- end }}
+  </h1>
+  <p>不是知识收藏，而是拿来就能用的思考骨架——卡住的时候翻一张，套上去，看清局势。点分类筛选，或直接搜名字。</p>
+</header>
+
+{{- if .Content }}
+<div class="post-content md-content">
+  {{- if not (.Param "disableAnchoredHeadings") }}
+  {{- partial "anchored_headings.html" .Content -}}
+  {{- else }}{{ .Content }}{{ end }}
+</div>
+{{- end }}
+
+{{- $pages := .RegularPages }}
+
+{{/* 统计各分类篇数 */}}
+{{- $counts := dict -}}
+{{- range $pages -}}
+  {{- with index .Params.categories 0 -}}
+    {{- $counts = merge $counts (dict . (add (index $counts . | default 0) 1)) -}}
+  {{- end -}}
+{{- end -}}
+{{- $catList := slice -}}
+{{- range $k, $v := $counts -}}
+  {{- $catList = $catList | append (dict "name" $k "count" $v) -}}
+{{- end -}}
+{{- $catList = sort $catList "count" "desc" -}}
+
+<div class="models-filter">
+  <div class="models-chips" id="modelsChips">
+    <button class="mchip active" type="button" data-cat="__all__">全部 <span class="mchip-count">{{ len $pages }}</span></button>
+    {{- range $catList }}
+    <button class="mchip" type="button" data-cat="{{ .name }}">{{ .name }} <span class="mchip-count">{{ .count }}</span></button>
+    {{- end }}
+  </div>
+  <input class="models-search" id="modelsSearch" type="search" placeholder="🔍 输入模型名，即时筛选…" aria-label="搜索思维模型">
+</div>
+
+<div class="models-grid" id="modelsGrid">
+  {{- range $pages.ByTitle }}
+  {{- $base := .File.ContentBaseName -}}
+  {{- $num := index (split $base "-") 0 -}}
+  {{- $name := strings.TrimPrefix (printf "%s-" $num) $base -}}
+  {{- $cat := index .Params.categories 0 | default "" -}}
+  <a class="model-card" href="{{ .RelPermalink }}" data-cat="{{ $cat }}" data-title="{{ $num }} {{ $name }}">
+    {{- with .Params.cover.image }}
+    <img class="model-cover" src="{{ . }}" alt="{{ $name }}" loading="lazy">
+    {{- end }}
+    <div class="model-body">
+      <div class="model-name"><span class="model-no">#{{ $num }}</span>{{ $name }}</div>
+      <div class="model-line">{{ .Description | default (.Summary | plainify) }}</div>
+      {{- with $cat }}<span class="model-cat">{{ . }}</span>{{ end }}
+    </div>
+  </a>
+  {{- end }}
+</div>
+<div class="models-empty" id="modelsEmpty">没有匹配的模型，换个关键词试试 🧐</div>
+
+<div class="models-more">
+  <a class="models-more-card" href="/graph/">
+    <span class="models-more-emoji">🗺️</span>
+    <span>
+      <span class="models-more-title">模型图谱</span>
+      <div class="models-more-desc">100 个模型的关联网络，一眼看清谁和谁联动</div>
+    </span>
+  </a>
+  <a class="models-more-card" href="/learn/">
+    <span class="models-more-emoji">📚</span>
+    <span>
+      <span class="models-more-title">学习路径</span>
+      <div class="models-more-desc">按主题串好的阅读顺序，从哪篇开始都不迷路</div>
+    </span>
+  </a>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var chips = document.querySelectorAll('#modelsChips .mchip');
+  var cards = document.querySelectorAll('#modelsGrid .model-card');
+  var searchInput = document.getElementById('modelsSearch');
+  var emptyHint = document.getElementById('modelsEmpty');
+  var activeCat = '__all__';
+  var keyword = '';
+
+  function applyFilter() {
+    var kw = keyword.trim().toLowerCase();
+    var visible = 0;
+    cards.forEach(function (card) {
+      var okCat = (activeCat === '__all__') || (card.getAttribute('data-cat') === activeCat);
+      var okKw = !kw || (card.getAttribute('data-title') || '').toLowerCase().indexOf(kw) !== -1;
+      var show = okCat && okKw;
+      card.hidden = !show;
+      if (show) visible++;
+    });
+    if (emptyHint) emptyHint.classList.toggle('show', visible === 0);
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeCat = chip.getAttribute('data-cat');
+      applyFilter();
+    });
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      keyword = searchInput.value;
+      applyFilter();
+    });
+  }
+})();
+</script>
+
+{{- end }}{{/* end main */}}

@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "刻意练习的完整训练系统：能力边缘、具体反馈、主动失败、慢速拆解、修正重复、睡眠巩固——天赋只决定起点，练法才决定终点。"
 tags: ["刻意练习", "学习方法", "终身学习", "反馈"]
-category: "学习方法"
+categories: ["学习方法"]
 aliases: ["/learn/deliberate-practice/"]
 cover:
     image: "cover.png"

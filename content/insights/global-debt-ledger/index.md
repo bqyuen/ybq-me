@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "全球债务冲破 348 万亿美元，这笔钱到底欠给谁？拆开这张谁都拆不开的网，你会看懂新闻里的国债、通胀，以及你被悄悄稀释的存款。"
 tags: ["经济", "全球债务", "通胀", "资产配置"]
-category: "思维进化"
+categories: ["思维进化"]
 cover:
     image: "cover.png"
     alt: "全球债务闭环信息图 · 348 万亿美元"

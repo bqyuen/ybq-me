@@ -82,21 +82,13 @@ timeZone = "Asia/Shanghai"
     url = "/daily/"
     weight = 6
   [[menu.main]]
-    name = "🗺️ 图谱"
-    url = "/graph/"
-    weight = 7
-  [[menu.main]]
-    name = "📚 学习路径"
-    url = "/learn/"
-    weight = 8
-  [[menu.main]]
     name = "🔍 搜索"
     url = "/search/"
-    weight = 9
+    weight = 7
   [[menu.main]]
     name = "关于"
     url = "/about/"
-    weight = 10
+    weight = 8
 
 # Markdown 配置
 [markup]

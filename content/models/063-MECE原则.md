@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "把问题切分成\"不重叠、不遗漏\"的碎片——你能看到完整的画面，不会在同一个地方看两遍，也不会漏掉某个角落"
 tags: ["思维模型", "管理框架", "MECE原则", "063"]
-category: "管理框架"
+categories: ["管理框架"]
 aliases: ["/learn/063-MECE原则/"]
 
 cover:
