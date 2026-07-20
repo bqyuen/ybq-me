@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "思维模型 · 反馈回路的 4 种类型 + 制造业实战"
 tags: ["每日核心", "思维模型", "反馈回路", "系统思考"]
-category: "思维方法"
+categories: ["思维方法"]
 aliases: ["/blog/daily/2026-07-17-002-feedback-loop/"]
 
 cover:

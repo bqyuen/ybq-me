@@ -509,3 +509,29 @@
 </script>
 
 {{- end -}}
+
+{{/* === 阅读进度条（仅文章页显示） === */}}
+<div id="reading-progress" aria-hidden="true"></div>
+<style>
+#reading-progress{position:fixed;top:0;left:0;height:3px;width:0;background:#C89F65;z-index:10000;display:none;pointer-events:none}
+</style>
+<script>
+(function () {
+  'use strict';
+  var bar = document.getElementById('reading-progress');
+  if (!bar) return;
+  var isPost = document.body.classList.contains('post-single') || document.querySelector('article.post-single');
+  if (!isPost) return;
+  bar.style.display = 'block';
+  function updateProgress() {
+    var doc = document.documentElement;
+    var scrolled = doc.scrollTop || document.body.scrollTop;
+    var total = doc.scrollHeight - doc.clientHeight;
+    var pct = total > 0 ? (scrolled / total) * 100 : 0;
+    bar.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+})();
+</script>

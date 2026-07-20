@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "触发 → 行动 → 多变的奖励 → 投入——让人持续回来的行为设计框架"
 tags: ["思维模型", "沟通影响", "HOOK上瘾模型", "088"]
-category: "沟通影响"
+categories: ["沟通影响"]
 aliases: ["/learn/088-HOOK上瘾模型/"]
 
 cover:

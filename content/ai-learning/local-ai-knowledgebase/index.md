@@ -112,7 +112,7 @@ scan → embed → merge → verify → sync_obsidian
 | `raw/articles/` | 原始资料，不可变 | 产品卡、法规文件、展会资料 |
 | `wiki/concepts/` | 概念页 | `环保制冷剂.md`、`法规.md`、`品牌体系.md` |
 | `wiki/entities/` | 实体页 | `产品目录.md`、`供应商画像.md` |
-| `wiki/strategies/` | 战略决策页 | `五星酒店准入.md`、`风险评估.md` |
+| `wiki/strategies/` | 战略决策页 | `大客户准入.md`、`风险评估.md` |
 | `outputs/queries/` | 查询结果存档 | 每次业务问题的结构化答案 |
 
 每次新资料进来，走 **Ingest 流水线**：边界判定 → 提取 5W1H → 创建/更新 wiki 页 → 级联更新 related → 更新 4 个 index → 写 log → Lint 质检。

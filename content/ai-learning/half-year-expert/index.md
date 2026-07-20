@@ -4,7 +4,7 @@ date: 2026-07-17
 draft: false
 description: "普通人半年成为专家的底层方法：不是天赋，不是时间，而是把领域切到足够窄之后的六步闭环。"
 tags: ["学习方法", "刻意练习", "终身学习", "专家"]
-category: "思维进化"
+categories: ["思维进化"]
 cover:
     image: "cover.png"
     alt: "半年成为专家方法论信息图 · 从广而浅到窄而深"
