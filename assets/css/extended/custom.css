@@ -689,3 +689,122 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ========== 思维模型星图入口横幅 ========== */
+.starmap-banner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 2.2em 0;
+  padding: 36px 38px;
+  border-radius: 18px;
+  text-decoration: none !important;
+  background:
+    radial-gradient(1000px 320px at 92% -20%, rgba(200, 159, 101, 0.24), transparent 55%),
+    linear-gradient(135deg, #16223a 0%, #1E3A5F 58%, #26486f 100%);
+  border: 1px solid rgba(200, 159, 101, 0.38);
+  box-shadow: 0 14px 40px rgba(18, 30, 52, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.starmap-banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 56px rgba(18, 30, 52, 0.38);
+}
+
+.starmap-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.starmap-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(200, 159, 101, 0.92);
+  margin-bottom: 10px;
+}
+
+.starmap-title {
+  font-size: 27px;
+  font-weight: 800;
+  color: #FAF9F6;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+
+.starmap-sub {
+  font-size: 14.5px;
+  line-height: 1.8;
+  color: rgba(250, 249, 246, 0.72);
+  margin-bottom: 18px;
+}
+
+.starmap-cta {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 10px;
+  background: #C89F65;
+  color: #16223a;
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: background 0.15s ease;
+}
+
+.starmap-banner:hover .starmap-cta {
+  background: #dab67f;
+}
+
+.starmap-art {
+  flex: 0 0 320px;
+}
+
+.starmap-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 栏目页 slim 变体 */
+.starmap-banner.slim {
+  margin: 0.4em 0 1.4em;
+  padding: 24px 28px;
+}
+
+.starmap-banner.slim .starmap-title {
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+
+.starmap-banner.slim .starmap-eyebrow {
+  margin-bottom: 6px;
+}
+
+.starmap-banner.slim .starmap-sub {
+  font-size: 13.5px;
+  margin-bottom: 12px;
+}
+
+.starmap-banner.slim .starmap-cta {
+  padding: 8px 18px;
+  font-size: 13.5px;
+}
+
+.starmap-banner.slim .starmap-art {
+  flex-basis: 260px;
+}
+
+@media screen and (max-width: 720px) {
+  .starmap-banner {
+    padding: 26px 22px;
+  }
+  .starmap-art {
+    display: none;
+  }
+  .starmap-title {
+    font-size: 22px;
+  }
+}
