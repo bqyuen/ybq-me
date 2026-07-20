@@ -1,6 +1,6 @@
 ---
 title: "ybq.me"
-description: "Gary 的认知游乐场 —— 思维模型 / AI 学习 / 管理实战 / 决策洞察 / 每日核心"
+description: "Gary 的认知游乐场 —— 思维模型 / AI 学习 / 决策洞察 / 每日核心"
 showSummary: false
 linkTitle: "首页"
 ---
@@ -98,7 +98,7 @@ linkTitle: "首页"
   </a>
 </div>
 
-## 🧰 五个工具箱
+## 🧰 四个工具箱
 
 <div class="toolbox-grid">
   <a class="toolbox-card" href="/models/">
@@ -112,12 +112,6 @@ linkTitle: "首页"
     <div class="toolbox-name">AI 学习</div>
     <div class="toolbox-pitch">让 AI 当你的私教：方法论 × 工具实战 × 提效清单</div>
     <div class="toolbox-latest">最新 · 刻意练习：练得爽要警惕</div>
-  </a>
-  <a class="toolbox-card" href="/management/">
-    <div class="toolbox-emoji">🏭</div>
-    <div class="toolbox-name">管理实战</div>
-    <div class="toolbox-pitch">多年 B2B 供应链一线手记，每一条都是踩坑换来的</div>
-    <div class="toolbox-latest">筹备中 · 敬请期待</div>
   </a>
   <a class="toolbox-card" href="/insights/">
     <div class="toolbox-emoji">🎯</div>
