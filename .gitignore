@@ -44,3 +44,5 @@ yarn.lock
 
 # Cloudflare 临时产物
 .wrangler/
+# iCloud 同步冲突副本
+* 2.*
