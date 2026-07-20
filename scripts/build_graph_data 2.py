@@ -70,12 +70,7 @@ def main():
 
     known = {n["id"] for n in nodes}
 
-    # 去重为无向边；双向互引的边权重 w=2（图谱中显示更粗）
-    directed = set()
-    for src, targets in related.items():
-        for t in targets:
-            directed.add((src, t["slug"]))
-
+    # 去重为无向边
     seen = set()
     links = []
     for src, targets in related.items():
@@ -89,8 +84,7 @@ def main():
             if key in seen:
                 continue
             seen.add(key)
-            mutual = (src, tgt) in directed and (tgt, src) in directed
-            links.append({"source": src, "target": tgt, "w": 2 if mutual else 1})
+            links.append({"source": src, "target": tgt})
 
     cats = collections.Counter(n["cat"] for n in nodes)
     categories = [{"name": c, "count": n} for c, n in cats.most_common()]
