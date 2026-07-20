@@ -66,9 +66,13 @@ timeZone = "Asia/Shanghai"
     url = "/models/"
     weight = 2
   [[menu.main]]
+    name = "🌌 星图"
+    url = "/graph/"
+    weight = 3
+  [[menu.main]]
     name = "🤖 AI 学习"
     url = "/ai-learning/"
-    weight = 3
+    weight = 4
   [[menu.main]]
     name = "🎯 决策洞察"
     url = "/insights/"
