@@ -16,7 +16,7 @@ timeZone = "Asia/Shanghai"
 
 [params]
   env = "production"
-  description = "Gary 的认知游乐场 · 思维模型 / AI 学习 / 管理实战 / 决策洞察"
+  description = "Gary 的认知游乐场 · 思维模型 / AI 学习 / 决策洞察 / 每日核心"
   author = "Gary"
   keywords = ["终身学习", "思维模型", "AI", "ybq.me"]
   DateFormat = "2006-01-02"
@@ -37,7 +37,7 @@ timeZone = "Asia/Shanghai"
   hideSummary = false
   showtoc = true
   tocopen = false
-  mainSections = ["models", "ai-learning", "insights", "management", "daily"]
+  mainSections = ["models", "ai-learning", "insights", "daily"]
 
   [params.search]
     enable = true
@@ -69,10 +69,6 @@ timeZone = "Asia/Shanghai"
     name = "🤖 AI 学习"
     url = "/ai-learning/"
     weight = 3
-  [[menu.main]]
-    name = "🏭 管理实战"
-    url = "/management/"
-    weight = 4
   [[menu.main]]
     name = "🎯 决策洞察"
     url = "/insights/"
