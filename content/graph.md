@@ -215,7 +215,7 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
 
     var cats = data.categories.map(function (c) { return c.name; });
     var cx = width / 2, cy = height / 2;
-    var clusterR = Math.min(width, height) * 0.30;
+    var clusterR = Math.min(width, height) * 0.36;
     var catCenter = {};
     cats.forEach(function (c, i) {
       var a = (i / cats.length) * Math.PI * 2 - Math.PI / 2;
@@ -250,12 +250,15 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
       });
     svg.call(zoom);
 
+    // 初始视野略微拉远，给摊开的星图留出呼吸边距
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width * 0.055, height * 0.055).scale(0.89));
+
     var simulation = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(50).strength(0.55))
-      .force('charge', d3.forceManyBody().strength(-85))
-      .force('collision', d3.forceCollide().radius(function (d) { return radius(d) + 7; }))
-      .force('x', d3.forceX(function (d) { return (catCenter[d.cat] || { x: cx }).x; }).strength(0.09))
-      .force('y', d3.forceY(function (d) { return (catCenter[d.cat] || { y: cy }).y; }).strength(0.09))
+      .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(82).strength(0.42))
+      .force('charge', d3.forceManyBody().strength(-150))
+      .force('collision', d3.forceCollide().radius(function (d) { return radius(d) + 14; }))
+      .force('x', d3.forceX(function (d) { return (catCenter[d.cat] || { x: cx }).x; }).strength(0.075))
+      .force('y', d3.forceY(function (d) { return (catCenter[d.cat] || { y: cy }).y; }).strength(0.075))
       .force('center', d3.forceCenter(cx, cy))
       .alpha(0.9)
       .alphaDecay(0.02)
