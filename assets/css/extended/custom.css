@@ -808,3 +808,267 @@
     font-size: 22px;
   }
 }
+
+/* =========================================================
+   2025 升级：宽屏布局 / Hero 重做 / 入场动效 / 分区背景
+   流式排版 / 导航毛玻璃
+   ========================================================= */
+
+html, body {
+  overflow-x: clip;
+}
+
+/* ---- 1. 展示页加宽：首页 / 列表页 ~1280px，文章正文页保持 720px ---- */
+body.list {
+  --main-width: 1232px;
+  --nav-width: 1232px;
+}
+
+body.list .main {
+  max-width: min(1280px, 92vw);
+  padding-inline: clamp(16px, 3vw, 24px);
+}
+
+body.list .header-nav,
+body.list .footer {
+  max-width: min(1280px, 92vw);
+}
+
+/* ---- 6. 导航栏毛玻璃 ---- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--theme);
+  background: color-mix(in srgb, var(--theme) 74%, transparent);
+  -webkit-backdrop-filter: saturate(1.5) blur(14px);
+  backdrop-filter: saturate(1.5) blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.header.scrolled {
+  border-bottom-color: var(--border);
+  background: color-mix(in srgb, var(--theme) 82%, transparent);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header { background: var(--theme); }
+}
+
+/* ---- 2. Hero 重做：流式大标题 + 淡网格/星光背景 ---- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  margin: clamp(1em, 3vw, 2em) 0 clamp(1.2em, 3vw, 2em);
+  padding: clamp(36px, 6vw, 72px) clamp(24px, 5vw, 64px);
+  border-radius: 20px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(30, 58, 95, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 58, 95, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(80% 90% at 30% 10%, rgba(0,0,0,0.9), transparent 75%);
+  -webkit-mask-image: radial-gradient(80% 90% at 30% 10%, rgba(0,0,0,0.9), transparent 75%);
+}
+
+[data-theme="dark"] .hero::before {
+  background-image:
+    linear-gradient(rgba(200, 159, 101, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 159, 101, 0.07) 1px, transparent 1px);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 26%, rgba(200, 159, 101, 0.55), transparent 100%),
+    radial-gradient(1.4px 1.4px at 38% 12%, rgba(30, 58, 95, 0.4), transparent 100%),
+    radial-gradient(1.8px 1.8px at 66% 30%, rgba(200, 159, 101, 0.45), transparent 100%),
+    radial-gradient(1.3px 1.3px at 82% 16%, rgba(127, 179, 200, 0.5), transparent 100%),
+    radial-gradient(1.5px 1.5px at 92% 44%, rgba(200, 159, 101, 0.4), transparent 100%),
+    radial-gradient(1.3px 1.3px at 55% 8%, rgba(30, 58, 95, 0.35), transparent 100%);
+  animation: heroTwinkle 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes heroTwinkle {
+  from { opacity: 0.35; }
+  to   { opacity: 1; }
+}
+
+.hero-main,
+.hero-stats {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: clamp(26px, 4.4vw, 48px);
+  line-height: 1.28;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.hero-sub {
+  font-size: clamp(14.5px, 1.4vw, 16.5px);
+  max-width: 46em;
+}
+
+.hero-btn-ghost {
+  border: 1.5px solid transparent;
+  color: var(--secondary) !important;
+}
+
+.hero-btn-ghost:hover {
+  color: #C89F65 !important;
+}
+
+.hero-stat-num {
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- 3. 滚动入场动效 ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero::after {
+    animation: none;
+  }
+}
+
+/* ---- 4. 区块背景分区（全出血 白 / 暖灰 / 深色 交替） ---- */
+.home-band {
+  margin-inline: calc(50% - 50vw);
+  padding: clamp(40px, 6vw, 72px) calc(50vw - 50%);
+  border-bottom: 1px solid var(--border);
+}
+
+.home-band.band--plain {
+  background: var(--theme);
+}
+
+.home-band.band--warm {
+  background: linear-gradient(180deg, rgba(200, 159, 101, 0.07), rgba(200, 159, 101, 0.03)),
+              var(--code-bg);
+}
+
+.home-band.band--dark {
+  background:
+    radial-gradient(900px 320px at 88% -10%, rgba(200, 159, 101, 0.14), transparent 60%),
+    linear-gradient(160deg, #16223a 0%, #1E3A5F 70%, #234468 100%);
+  border-bottom: none;
+}
+
+.home-band.band--dark .band-title {
+  color: #FAF9F6;
+}
+
+.band-title {
+  margin: 0 0 clamp(20px, 3vw, 32px);
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--primary);
+}
+
+/* 深色带内工具箱卡片适配 */
+.band--dark .toolbox-card {
+  background: rgba(250, 249, 246, 0.05);
+  border-color: rgba(250, 249, 246, 0.14);
+}
+
+.band--dark .toolbox-card:hover {
+  border-color: rgba(200, 159, 101, 0.65);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.band--dark .toolbox-name {
+  color: #FAF9F6;
+}
+
+.band--dark .toolbox-pitch {
+  color: rgba(250, 249, 246, 0.68);
+}
+
+.band--dark .toolbox-latest {
+  border-top-color: rgba(250, 249, 246, 0.16);
+  color: rgba(250, 249, 246, 0.45);
+}
+
+/* 联系区 */
+.band--contact {
+  border-bottom: none;
+}
+
+.contact-list {
+  margin: 0 0 1.2em;
+  padding-left: 1.4em;
+  color: var(--content);
+  line-height: 2;
+}
+
+.privacy-note {
+  margin: 0;
+  padding: 14px 18px;
+  border-left: 3px solid #C89F65;
+  background: var(--code-bg);
+  border-radius: 0 8px 8px 0;
+  color: var(--secondary);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* ---- 5. 流式排版：列表页标题 clamp ---- */
+.page-header h1 {
+  font-size: clamp(26px, 3.4vw, 40px);
+  line-height: 1.3;
+}
+
+/* 首页分区内栅格间距微调（宽屏更舒展） */
+body.list .top10-grid { gap: clamp(12px, 1.4vw, 18px); }
+body.list .recent-grid { gap: clamp(14px, 1.6vw, 20px); }
+body.list .models-grid { gap: clamp(14px, 1.6vw, 20px); }
+
+/* 折叠屏合起（374px）防溢出 */
+@media screen and (max-width: 420px) {
+  .hero {
+    padding: 28px 18px 24px;
+  }
+  .hero-title {
+    font-size: clamp(23px, 7.4vw, 28px);
+  }
+  .hero-br {
+    display: none;
+  }
+  .hero-actions .hero-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  .home-band {
+    padding-block: 34px;
+  }
+}
