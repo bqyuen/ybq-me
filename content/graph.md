@@ -35,7 +35,7 @@ description: "100 个思维模型 · 10 大分类 · 353 组关联 —— 一张
       <div id="gp-meta"></div>
       <div id="gp-rel-title">与之联动</div>
       <div id="gp-rel"></div>
-      <a id="gp-cta" href="#">阅读原文 →</a>
+      <a id="gp-cta" role="link">阅读原文 →</a>
     </div>
   </div>
 </div>
@@ -112,7 +112,7 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
 #gp-rel { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .gp-chip { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border, #e5e5e5); background: var(--theme, #fff); color: var(--content, #333); font-size: 12px; cursor: pointer; transition: all .2s cubic-bezier(.34,1.4,.44,1); }
 .gp-chip:hover { border-color: #C89F65; color: #C89F65; transform: translateY(-2px); box-shadow: 0 3px 8px rgba(200,159,101,.25); }
-#gp-cta { display: block; margin-top: 16px; padding: 10px 0; text-align: center; border-radius: 10px; background: #1E3A5F; color: #FAF9F6 !important; font-size: 14px; font-weight: 600; text-decoration: none; transition: all .2s; }
+#gp-cta { display: block; margin-top: 16px; padding: 10px 0; text-align: center; border-radius: 10px; background: #1E3A5F; color: #FAF9F6 !important; font-size: 14px; font-weight: 600; text-decoration: none; transition: all .2s; cursor: pointer; }
 #gp-cta:hover { background: #274a77; box-shadow: 0 8px 20px rgba(30,58,95,.35); transform: translateY(-1px); }
 #graph-tooltip { display: none; opacity: 0; transform: translateY(5px); transition: opacity .2s ease, transform .2s cubic-bezier(.3,1.3,.4,1); position: fixed; padding: 10px 14px; border-radius: 10px; background: #16223a; color: #fff; font-size: 13px; pointer-events: none; z-index: 100; max-width: 260px; box-shadow: 0 6px 20px rgba(0,0,0,.32); line-height: 1.6; }
 #graph-tooltip.show { opacity: 1; transform: translateY(0); }
