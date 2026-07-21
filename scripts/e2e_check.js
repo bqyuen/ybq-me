@@ -186,6 +186,24 @@ async function goto(page, url) {
       return img ? img.complete && img.naturalWidth > 0 : true;
     });
     record('文章页封面图加载', coverOk, '');
+    // giscus 评论区（懒加载，需滚动触发）
+    await page.evaluate(() => {
+      const f = document.querySelector('iframe.giscus-frame');
+      if (f) f.scrollIntoView({ block: 'center' });
+    });
+    let giscusOk = false, giscusNote = 'iframe 未出现';
+    for (let i = 0; i < 20; i++) {
+      const fr = page.frames().find(f => f.url().includes('giscus.app'));
+      if (fr) {
+        await page.waitForTimeout(2500);
+        const txt = await fr.evaluate(() => document.body.innerText || '').catch(() => '');
+        giscusOk = /GitHub|登录|Sign|评论|comment/i.test(txt) && !/not installed|未安装/i.test(txt);
+        giscusNote = txt.replace(/\s+/g, ' ').slice(0, 40);
+        break;
+      }
+      await page.waitForTimeout(500);
+    }
+    record('giscus 评论区渲染', giscusOk, giscusNote);
     await page.close();
   }
 
