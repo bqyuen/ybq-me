@@ -535,3 +535,57 @@
   updateProgress();
 })();
 </script>
+
+{{/* === 全站滚动入场动效 / Hero 数字 count-up / 导航毛玻璃（2025 升级） === */}}
+<script>
+(function () {
+  'use strict';
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 导航毛玻璃：滚动后加分隔线 */
+  var header = document.querySelector('.header');
+  if (header) {
+    var onScroll = function () {
+      header.classList.toggle('scrolled', (window.scrollY || 0) > 8);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* Count-up */
+  function countUp(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    if (isNaN(target)) return;
+    if (reduced) { el.textContent = String(target); return; }
+    var dur = 1200, start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* IntersectionObserver：淡入 + 上移；进入视口时触发 count-up */
+  var revealEls = document.querySelectorAll('.reveal');
+  var counters = document.querySelectorAll('.hero-stat-num[data-count]');
+  if (reduced || !('IntersectionObserver' in window)) {
+    revealEls.forEach(function (el) { el.classList.add('in'); });
+    counters.forEach(countUp);
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      if (entry.target.classList.contains('hero')) {
+        counters.forEach(countUp);
+      }
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  revealEls.forEach(function (el) { io.observe(el); });
+})();
+</script>
