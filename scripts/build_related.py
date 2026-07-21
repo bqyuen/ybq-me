@@ -109,7 +109,14 @@ if __name__ == "__main__":
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(related, f, ensure_ascii=False, indent=2)
 
+    # 同步一份到 Hugo data 目录，供 .Site.Data.related（文章页相关推荐卡片）使用
+    DATA_OUT = os.path.join(ROOT, "data/related.json")
+    os.makedirs(os.path.dirname(DATA_OUT), exist_ok=True)
+    with open(DATA_OUT, "w", encoding="utf-8") as f:
+        json.dump(related, f, ensure_ascii=False, indent=2)
+
     print(f"Written to {OUT}")
+    print(f"Written to {DATA_OUT}")
     # sample
     for slug in ["001-机会成本", "057-复利效应", "075-飞轮效应"]:
         if slug in related:
