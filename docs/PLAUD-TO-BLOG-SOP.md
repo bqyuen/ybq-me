@@ -178,4 +178,23 @@ cover:
 
 ---
 
-*已验证案例：每日核心 #003 驭人术（2026-07-22，模式 A 全流程 ~2 分钟上线）；博客版三篇（WorkBuddy 侧 plaud_exports）。*
+---
+
+## 七、视觉规范（v1.1 新增）
+
+| 项 | 标准 |
+|---|---|
+| 封面分辨率 | **2x 渲染**：daily 2400×1260，博客版 2400×1260（`gen_daily_cover.py --scale 2` 为默认） |
+| 内文插图 | **每篇至少 1-2 张信息图**：对比图 / 机制示意图 / 结构全图 / 因果链图 |
+| 插图尺寸 | 2000px 宽起，与封面同色系（daily 米白底 + navy/gold；insights 深色底 + gold/red） |
+| 插图存放 | daily → `static/images/daily/<日期>-<slug>-<名>.png`；页 bundle → 目录内相对引用 |
+| 绘制方式 | PIL 代码绘制（字体用运行时自带 NotoSansSC；**禁用 emoji**，会渲染成豆腐块） |
+| 自检 | 生成后必须 ReadMediaFile 回看：无豆腐块、无大面积留白、无文字溢出 |
+
+## 八、已验证案例
+
+| 日期 | 文章 | 模式 | 链接 |
+|---|---|---|---|
+| 2026-07-22 | 每日核心 #003 · 驭人术：管理者最贵的资产是信用 | A | https://ybq.me/daily/2026-07-22-003-leadership-credit/ |
+| 2026-07-23 | 善良没有力量，就是猎物 | B · insights | https://ybq.me/insights/kindness-without-power/ |
+| — | 全球债务账单 / 刻意练习 / 半年专家 | B（WorkBuddy 侧 plaud_exports） | ybq.me 站内 |

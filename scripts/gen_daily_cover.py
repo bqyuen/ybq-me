@@ -10,7 +10,7 @@ import argparse, sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-W, H = 1200, 630
+BASE_W, BASE_H = 1200, 630
 BG = (250, 247, 240); NAVY = (31, 41, 66); GOLD = (176, 141, 74)
 GRAY = (110, 110, 110); PALE = (232, 224, 205); BORDER = (200, 190, 165)
 BADGE = (90, 100, 130)
@@ -37,42 +37,45 @@ def main():
     ap.add_argument("--badge", default="每日核心")
     ap.add_argument("--bignum", default=None, help="右下角大数字，默认 %03d")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--scale", type=int, default=2, help="渲染倍数，默认 2（2400x1260 高清）")
     a = ap.parse_args()
 
+    S = a.scale
+    W, H = BASE_W * S, BASE_H * S
     bold, reg = font_pair()
-    F = lambda size, b=True: ImageFont.truetype(bold if b else reg, size)
+    F = lambda size, b=True: ImageFont.truetype(bold if b else reg, size * S)
 
     im = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle([8, 8, W - 9, H - 9], radius=22, outline=BORDER, width=2)
+    d.rounded_rectangle([8*S, 8*S, W - 9*S, H - 9*S], radius=22, outline=BORDER, width=2*S)
 
     # 徽标（宽度自适应）
     bf = F(26)
     bw = d.textlength(a.badge, font=bf)
-    d.rounded_rectangle([48, 48, 48 + bw + 52, 100], radius=26, fill=BADGE)
-    d.text((48 + (bw + 52) / 2, 74), a.badge, font=bf, fill="white", anchor="mm")
+    d.rounded_rectangle([48*S, 48*S, 48*S + bw + 52*S, 100*S], radius=26, fill=BADGE)
+    d.text((48*S + (bw + 52*S) / 2, 74*S), a.badge, font=bf, fill="white", anchor="mm")
 
-    d.text((1140, 74), f"#{a.num}", font=F(30), fill=GOLD, anchor="mm")
+    d.text((1140*S, 74*S), f"#{a.num}", font=F(30), fill=GOLD, anchor="mm")
 
     tf = F(64)
-    d.text((60, 185), a.title, font=tf, fill=NAVY)
+    d.text((60*S, 185*S), a.title, font=tf, fill=NAVY)
     tw = min(d.textlength(a.title, font=tf), 620)
-    d.rounded_rectangle([62, 245, 62 + max(tw * 0.35, 120), 255], radius=4, fill=GOLD)
+    d.rounded_rectangle([62*S, 245*S, 62*S + max(tw * 0.35, 120*S), 255*S], radius=4, fill=GOLD)
 
-    y = 300
+    y = 300*S
     for line in [s for s in a.subtitle.split(",") if s]:
-        d.text((60, y), line, font=F(30, False), fill=GRAY)
-        y += 50
+        d.text((60*S, y), line, font=F(30, False), fill=GRAY)
+        y += 50*S
 
     bignum = a.bignum or f"{int(a.num):03d}"
-    d.text((1180, 600), bignum, font=F(300), fill=PALE, anchor="rs")
+    d.text((1180*S, 600*S), bignum, font=F(300), fill=PALE, anchor="rs")
 
     qf = F(30)
     qw = d.textlength(a.quote, font=qf)
-    pw = qw + 90
+    pw = qw + 90*S
     x0 = (W - pw) / 2
-    d.rounded_rectangle([x0, 515, x0 + pw, 580], radius=32, fill=NAVY)
-    d.text((W / 2, 547), a.quote, font=qf, fill="white", anchor="mm")
+    d.rounded_rectangle([x0, 515*S, x0 + pw, 580*S], radius=32, fill=NAVY)
+    d.text((W / 2, 547*S), a.quote, font=qf, fill="white", anchor="mm")
 
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     im.save(a.out)
