@@ -110,9 +110,9 @@
 .ai-panel{position:fixed;right:24px;bottom:96px;width:min(400px,calc(100vw - 32px));max-height:min(640px,calc(100vh - 140px));background:var(--theme,#fff);color:var(--content,#333);border-radius:16px;border:1px solid var(--border,#e5e5e5);box-shadow:0 20px 60px rgba(0,0,0,.2),0 8px 20px rgba(0,0,0,.1);display:flex;flex-direction:column;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.96);transform-origin:bottom right;transition:opacity .2s ease,transform .2s ease,visibility .2s,width .25s ease,max-height .25s ease;z-index:9999;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
 .ai-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
 /* 三档尺寸 */
-.ai-panel[data-size="sm"]{width:min(400px,calc(100vw - 32px));max-height:min(640px,calc(100vh - 140px))}
-.ai-panel[data-size="md"]{width:min(560px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 100px))}
-.ai-panel[data-size="lg"]{width:min(720px,calc(100vw - 32px));max-height:min(800px,calc(100vh - 80px))}
+.ai-panel[data-size="sm"]{width:min(400px,calc(100vw - 32px));max-height:min(700px,calc(100vh - 120px))}
+.ai-panel[data-size="md"]{width:min(560px,calc(100vw - 32px));max-height:min(780px,calc(100vh - 80px))}
+.ai-panel[data-size="lg"]{width:min(720px,calc(100vw - 32px));max-height:min(860px,calc(100vh - 60px))}
 
 /* === 面板头部 === */
 .ai-panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--code-bg,#f7f7f7);border-bottom:1px solid var(--border,#eee)}
@@ -206,7 +206,7 @@
 }
 /* 中屏（iPad）隐藏大档提示 */
 @media screen and (min-width:601px) and (max-width:1024px){
-  .ai-panel[data-size="lg"]{width:min(600px,calc(100vw - 32px));max-height:min(750px,calc(100vh - 80px))}
+  .ai-panel[data-size="lg"]{width:min(600px,calc(100vw - 32px));max-height:min(810px,calc(100vh - 60px))}
 }
 
 /* === 功能按钮 === */
