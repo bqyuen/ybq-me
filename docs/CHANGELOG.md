@@ -7,6 +7,19 @@
 
 ## 2026-07-29
 
+### 13:13 部署（WorkBuddy · commit `9fc161f` · wrangler deploy · Pages token `cfut_***7751`）
+
+AI 助手面板高度微调（三档各+60px）。
+
+| 变更 | 说明 |
+|------|------|
+| S 档高度 | 640px → **700px** |
+| M 档高度 | 720px → **780px** |
+| L 档高度 | 800px → **860px** |
+| 中屏 L 档 | 750px → **810px** |
+
+---
+
 ### 11:38 部署（WorkBuddy · commit `7b293b1` · wrangler deploy）
 
 AI 助手面板三档尺寸调节（S/M/L）+ CHANGELOG 更新日志机制。
