@@ -1,0 +1,198 @@
+{{- /* AI 微交互 — 磁性光标 + 导航呼吸 + 彩蛋 + 阅读里程碑 */ -}}
+{{- if not (eq .Layout "search") -}}
+<style>
+/* 磁性光标 */
+.magnetic-hover {
+  transition: transform 0.2s cubic-bezier(.25,.46,.45,.94);
+  will-change: transform;
+}
+
+/* 导航栏呼吸 */
+.header-nav {
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.header-nav.scrolled {
+  box-shadow: 0 2px 20px rgba(200,159,101,.08);
+}
+
+/* 阅读里程碑弹窗 */
+.milestone-toast {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(15,20,30,.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(200,159,101,.3);
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  z-index: 10001;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(.34,1.4,.64,1);
+}
+.milestone-toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+.milestone-icon { font-size: 48px; margin-bottom: 12px; }
+.milestone-title { font-size: 20px; font-weight: 800; color: #f0e6d0; margin-bottom: 8px; }
+.milestone-desc { font-size: 14px; color: rgba(200,159,101,.8); line-height: 1.6; }
+.milestone-close {
+  margin-top: 1rem; padding: 8px 20px; border-radius: 10px;
+  border: none; background: rgba(200,159,101,.2); color: #C89F65;
+  font-size: 13px; cursor: pointer; transition: all .2s;
+}
+.milestone-close:hover { background: rgba(200,159,101,.35); }
+
+/* 彩蛋：光团变彩虹 */
+@keyframes rainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+.ai-fab.rainbow .ai-fab-core {
+  animation: rainbow 2s linear infinite, orbPulse 1s ease-in-out infinite !important;
+}
+
+/* 页面切换淡入 */
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.main { animation: pageSlideIn 0.5s ease-out; }
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  // === 磁性光标 ===
+  var MAGNETIC_RANGE = 60;
+  var MAGNETIC_STRENGTH = 0.3;
+
+  var magneticTargets = '.ai-fab, .top10-card, .toolbox-card, .ai-qa-chip, .ai-case-btn, .ai-search-btn, .hero-btn, .starmap-cta, .cat-chip';
+
+  document.addEventListener('mousemove', function(e) {
+    document.querySelectorAll(magneticTargets).forEach(function(el) {
+      var rect = el.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      var dx = e.clientX - cx;
+      var dy = e.clientY - cy;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < MAGNETIC_RANGE) {
+        var strength = (1 - dist / MAGNETIC_RANGE) * MAGNETIC_STRENGTH;
+        el.style.transform = 'translate(' + (dx * strength) + 'px, ' + (dy * strength) + 'px)';
+      } else {
+        el.style.transform = '';
+      }
+    });
+  });
+
+  // === 导航栏滚动效果 ===
+  var header = document.querySelector('.header-nav');
+  if (header) {
+    var lastScroll = 0;
+    window.addEventListener('scroll', function() {
+      var scrollY = window.scrollY;
+      if (scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      lastScroll = scrollY;
+    }, { passive: true });
+  }
+
+  // === 彩蛋：连续点击光团5次 ===
+  var fab = document.getElementById('ai-assistant-fab');
+  var clickCount = 0;
+  var clickTimer = null;
+
+  if (fab) {
+    fab.addEventListener('click', function() {
+      clickCount++;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(function() { clickCount = 0; }, 2000);
+
+      if (clickCount >= 5) {
+        clickCount = 0;
+        fab.classList.add('rainbow');
+        // 显示彩蛋消息
+        var hint = document.getElementById('ai-fab-hint');
+        if (hint) {
+          hint.textContent = '🌈 你发现了隐藏彩蛋！';
+          hint.classList.add('show');
+          setTimeout(function() { hint.classList.remove('show'); }, 3000);
+        }
+        setTimeout(function() { fab.classList.remove('rainbow'); }, 5000);
+      }
+    });
+  }
+
+  // === 阅读里程碑 ===
+  var MEMORY_KEY = 'ybq_ai_life_memory';
+  var memory = JSON.parse(localStorage.getItem(MEMORY_KEY) || '{}');
+  if (!memory.readModels) memory.readModels = [];
+
+  // 记录当前页面
+  var currentPath = window.location.pathname;
+  if (currentPath.indexOf('/models/') === 0 && memory.readModels.indexOf(currentPath) === -1) {
+    memory.readModels.push(currentPath);
+    localStorage.setItem(MEMORY_KEY, JSON.stringify(memory));
+  }
+
+  // 检查里程碑
+  var milestones = [
+    { count: 5, icon: '🌱', title: '知识萌芽', desc: '你已经探索了5个思维模型，知识的种子正在发芽。' },
+    { count: 10, icon: '🌿', title: '思维成长', desc: '10个模型入脑，你开始看到模型之间的关联了。' },
+    { count: 25, icon: '🌳', title: '知识之树', desc: '25个模型，你的思维框架正在成型。' },
+    { count: 50, icon: '🌟', title: '半程里程碑', desc: '50个模型！你已经掌握了半数思维工具。' },
+    { count: 100, icon: '👑', title: '思维大师', desc: '100个模型全部探索完毕，你是真正的思维大师！' }
+  ];
+
+  var readCount = memory.readModels ? memory.readModels.length : 0;
+  var shownMilestones = JSON.parse(localStorage.getItem('ybq_milestones_shown') || '[]');
+
+  milestones.forEach(function(m) {
+    if (readCount >= m.count && shownMilestones.indexOf(m.count) === -1) {
+      shownMilestones.push(m.count);
+      localStorage.setItem('ybq_milestones_shown', JSON.stringify(shownMilestones));
+
+      // 延迟显示
+      setTimeout(function() {
+        showMilestone(m);
+      }, 2000);
+    }
+  });
+
+  function showMilestone(m) {
+    var toast = document.createElement('div');
+    toast.className = 'milestone-toast';
+    toast.innerHTML = '<div class="milestone-icon">' + m.icon + '</div>' +
+      '<div class="milestone-title">' + m.title + '</div>' +
+      '<div class="milestone-desc">' + m.desc + '</div>' +
+      '<button class="milestone-close" onclick="this.parentElement.classList.remove(\'show\')">继续探索</button>';
+    document.body.appendChild(toast);
+
+    setTimeout(function() { toast.classList.add('show'); }, 100);
+    setTimeout(function() {
+      toast.classList.remove('show');
+      setTimeout(function() { toast.remove(); }, 500);
+    }, 8000);
+  }
+
+  // === 已读模型标记 ===
+  if (currentPath.indexOf('/models/') === 0) {
+    document.querySelectorAll('a[href*="/models/"]').forEach(function(link) {
+      if (memory.readModels && memory.readModels.indexOf(link.getAttribute('href')) !== -1) {
+        link.style.opacity = '0.7';
+        link.title = '已探索';
+      }
+    });
+  }
+})();
+</script>
+{{- end -}}

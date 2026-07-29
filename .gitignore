@@ -46,3 +46,8 @@ yarn.lock
 .wrangler/
 # iCloud 同步冲突副本
 * 2.*
+worker/wrangler.toml
+worker/generate_cases.js
+worker/case_pool*.json
+worker/kv_upload*.json
+worker/node_modules/

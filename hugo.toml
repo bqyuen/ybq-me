@@ -82,9 +82,13 @@ timeZone = "Asia/Shanghai"
     url = "/daily/"
     weight = 6
   [[menu.main]]
+    name = "⚖️ 对比"
+    url = "/compare/"
+    weight = 7
+  [[menu.main]]
     name = "🔍 搜索"
     url = "/search/"
-    weight = 7
+    weight = 8
   [[menu.main]]
     name = "关于"
     url = "/about/"

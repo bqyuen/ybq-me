@@ -1,0 +1,154 @@
+{{- /* AI 关联推荐 — 每篇文章底部推荐相关模型（基于实际模型列表） */ -}}
+{{- if and (eq .Section "models") (not (eq .Layout "search")) -}}
+<div class="ai-related" id="ai-related">
+  <div class="ai-related-header">
+    <span class="ai-related-icon">🔗</span>
+    <h3 class="ai-related-title">相关思维模型</h3>
+  </div>
+  <div class="ai-related-grid" id="ai-related-grid">
+    <div class="ai-related-loading">正在寻找关联…</div>
+  </div>
+</div>
+
+<style>
+.ai-related {
+  margin: 2rem 0; padding: 1.5rem;
+  background: var(--entry, #f8f8f8);
+  border-radius: 14px; border: 1px solid var(--border, #eee);
+}
+.ai-related-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+.ai-related-icon { font-size: 20px; }
+.ai-related-title { font-size: 1rem; font-weight: 700; color: var(--content, #333); margin: 0; }
+.ai-related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.ai-related-loading { grid-column: 1 / -1; text-align: center; color: var(--secondary, #999); font-size: 13px; padding: 1rem; }
+.ai-related-card {
+  padding: 14px; border-radius: 10px;
+  background: var(--theme, #fff); border: 1px solid var(--border, #eee);
+  text-decoration: none; color: var(--content, #333);
+  transition: all .2s; display: block;
+}
+.ai-related-card:hover {
+  border-color: #C89F65; transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(200,159,101,.15);
+}
+.ai-related-card-num { font-size: 11px; color: #C89F65; font-weight: 700; }
+.ai-related-card-name { font-size: 14px; font-weight: 600; margin: 4px 0; }
+.ai-related-card-reason { font-size: 12px; color: var(--secondary, #999); line-height: 1.5; }
+</style>
+
+<script>
+(function() {
+  var RELATED_API = 'https://ybq-me-ai.garyyuen.workers.dev';
+  var grid = document.getElementById('ai-related-grid');
+  if (!grid) return;
+
+  // 实际存在的模型列表
+  var MODELS = [
+    '001-机会成本','002-沉没成本','003-直觉','004-决策树','005-非sr思维','006-确认偏误',
+    '007-易得性偏差','008-逆向思维','009-六顶思考帽','010-101010旁观','011-升维思维',
+    '012-笛卡尔思维','013-第一性原理','014-奥卡姆剃刀','015-马斯洛需求层次理论',
+    '016-反脆弱','017-万物联系','018-万物系统','019-大脑系统','020-卡尼曼双系统',
+    '021-冯诺依曼','022-三层解释','023-损失规避','024-替身决策','025-多维视角',
+    '026-局部全局最优','027-不平衡性','028-破界思维','029-非线性思维','030-自我催化',
+    '031-优先排序','032-黄金圈思维','033-心流理论','034-长线思考','035-隐含前提',
+    '036-时光机理论','037-升维打击','038-凸透放大镜思维','039-凹透缩小镜思维','040-九宫格',
+    '041-反作用力','042-思维投影','043-蝴蝶效应','044-成长破圈','045-上帝视角',
+    '046-演绎法','047-可复制化','048-幸存者偏差','049-冰山理论','050-邓克效应',
+    '051-效率思维','052-福格行为','053-反熵增','054-混沌与秩序','055-费马帕斯卡',
+    '056-费曼技巧','057-复利效应','058-二八定律','059-决策损失','060-启发式偏差',
+    '061-批判性思维','062-金字塔原理','063-mece原则','064-耗散结构理论','065-冗余备份',
+    '066-路径依赖','067-元认知','068-排列组合','069-人类误判心理','070-遗忘曲线',
+    '071-断裂点理论','072-杠杆原理','073-长尾理论','074-沉默的螺旋','075-飞轮效应',
+    '076-swot分析','077-pdca循环','078-周哈里窗','079-煤气灯效应','080-系列位置效应',
+    '081-推论阶梯','082-反事实思维','083-长短板理论','084-鸟笼效应','085-峰终定律',
+    '086-5w1h分析法','087-归因效应','088-hook上瘾模型','089-情境领导理论','090-博弈论',
+    '091-动态思维','092-溯因推理','093-情绪abc理论','094-蘑菇管理','095-前景理论',
+    '096-双目标清单','097-梅特卡夫法则','098-正确与非共识','099-波特五力分析','100-护城河理论'
+  ];
+
+  var title = document.title.replace(/\s*[|\-·].*$/, '').trim();
+  var currentSlug = window.location.pathname.split('/').filter(Boolean).pop();
+
+  // 从缓存读取
+  var cacheKey = 'ai_related_v2_' + currentSlug;
+  var cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    grid.innerHTML = cached;
+    return;
+  }
+
+  // 构建prompt：让AI从实际列表中选择
+  var modelList = MODELS.join('、');
+  var prompt = '当前正在阅读的模型：' + title + '。\n\n以下是从网站中实际存在的100个思维模型列表：\n' + modelList + '\n\n请从上述列表中选择3个与当前模型最相关的模型。必须严格按照以下格式返回，每行一个：\n编号-名称：一句话关联理由\n\n例如：\n004-决策树：与机会成本配合使用，帮助量化不同选择的期望值\n\n注意：必须使用列表中的精确名称，不要修改任何字符。';
+
+  // 模糊匹配模型名
+  function findModel(query) {
+    query = query.replace(/^[0-9]+[-.、]\s*/, '').trim();
+    // 精确匹配
+    for (var i = 0; i < MODELS.length; i++) {
+      var parts = MODELS[i].split('-');
+      var name = parts.slice(1).join('-');
+      if (name === query || name.indexOf(query) !== -1 || query.indexOf(name) !== -1) {
+        return MODELS[i];
+      }
+    }
+    // 模糊匹配（去掉常见后缀）
+    var cleanQuery = query.replace(/理论|法则|效应|原理|思维|定律|原则|模型|方法|分析|框架/g, '');
+    for (var j = 0; j < MODELS.length; j++) {
+      var p = MODELS[j].split('-');
+      var n = p.slice(1).join('-').replace(/理论|法则|效应|原理|思维|定律|原则|模型|方法|分析|框架/g, '');
+      if (n === cleanQuery || n.indexOf(cleanQuery) !== -1 || cleanQuery.indexOf(n) !== -1) {
+        return MODELS[j];
+      }
+    }
+    return null;
+  }
+
+  fetch(RELATED_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'ask',
+      question: prompt,
+      history: [],
+      pageContext: { title: title, summary: '思维模型关联推荐', url: window.location.pathname }
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.answer) { grid.innerHTML = ''; return; }
+    var html = '';
+    var lines = data.answer.split('\n').filter(function(l) { return l.trim(); });
+
+    lines.forEach(function(line) {
+      // 匹配多种格式
+      var match = line.match(/^(?:\d{1,3}[-.])?\s*(.+?)[：:—–\-]\s*(.+)/);
+      if (match) {
+        var nameQuery = match[1].trim();
+        var reason = match[2].trim();
+        var slug = findModel(nameQuery);
+
+        if (slug) {
+          var parts = slug.split('-');
+          var num = parts[0];
+          var name = parts.slice(1).join('-');
+          html += '<a class="ai-related-card" href="/models/' + encodeURIComponent(slug) + '/">' +
+            '<div class="ai-related-card-num">#' + num + '</div>' +
+            '<div class="ai-related-card-name">' + name + '</div>' +
+            '<div class="ai-related-card-reason">' + reason + '</div></a>';
+        }
+      }
+    });
+
+    if (html) {
+      grid.innerHTML = html;
+      try { localStorage.setItem(cacheKey, html); } catch(e) {}
+    } else {
+      grid.innerHTML = '<div style="text-align:center;color:var(--secondary,#999)">暂无推荐</div>';
+      try { localStorage.removeItem(cacheKey); } catch(e) {} // 清除空缓存
+    }
+  })
+  .catch(function() { grid.innerHTML = ''; });
+})();
+</script>
+{{- end -}}

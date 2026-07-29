@@ -1,0 +1,136 @@
+{{- /* AI 每日模型 — 首页内联版 + 独立版 */ -}}
+
+<style>
+.ai-daily {
+  margin: 2rem auto; max-width: 720px;
+  padding: 0 1rem;
+}
+.ai-daily-inner {
+  padding: 2rem; border-radius: 18px;
+  background: linear-gradient(135deg, rgba(200,159,101,.08), rgba(30,58,95,.06));
+  border: 1px solid rgba(200,159,101,.15);
+  position: relative; overflow: hidden;
+}
+.ai-daily-inner::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,159,101,.12), transparent 70%);
+  pointer-events: none;
+}
+.ai-daily-badge {
+  display: inline-block; padding: 4px 14px; border-radius: 20px;
+  background: rgba(200,159,101,.15); color: #C89F65;
+  font-size: 12px; font-weight: 700; margin-bottom: 1rem;
+}
+.ai-daily-loading { color: var(--secondary, #999); font-size: 14px; }
+.ai-daily-num { font-size: 12px; color: #C89F65; font-weight: 700; }
+.ai-daily-name { font-size: 1.4rem; font-weight: 800; color: var(--content, #222); margin: 4px 0 0.5rem; }
+.ai-daily-name a { color: inherit; text-decoration: none; }
+.ai-daily-name a:hover { color: #C89F65; }
+.ai-daily-quote {
+  font-size: 15px; line-height: 1.8; color: var(--content, #444);
+  margin-bottom: 1rem; font-style: italic;
+  border-left: 3px solid rgba(200,159,101,.3); padding-left: 14px;
+}
+.ai-daily-prompt {
+  font-size: 13px; color: var(--secondary, #777); line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.ai-daily-cta {
+  display: inline-block; padding: 8px 18px; border-radius: 10px;
+  background: rgba(200,159,101,.12); color: #C89F65;
+  font-size: 13px; font-weight: 600; text-decoration: none;
+  transition: all .2s;
+}
+.ai-daily-cta:hover { background: rgba(200,159,101,.22); transform: translateY(-1px); }
+</style>
+
+<script>
+(function() {
+  var DAILY_API = 'https://ybq-me-ai.garyyuen.workers.dev';
+  var content = document.getElementById('ai-daily-content-inline') || document.getElementById('ai-daily-content');
+  if (!content) return;
+
+  var MODELS = [
+    '001-机会成本','002-沉没成本','003-直觉','004-决策树','006-确认偏误',
+    '007-易得性偏差','008-逆向思维','009-六顶思考帽','013-第一性原理',
+    '014-奥卡姆剃刀','016-反脆弱','019-大脑系统','020-卡尼曼双系统',
+    '032-黄金圈思维','033-心流理论','043-蝴蝶效应','048-幸存者偏差',
+    '057-复利效应','058-二八定律','067-元认知','072-杠杆原理',
+    '075-飞轮效应','085-峰终定律','090-博弈论','095-前景理论','100-护城河理论'
+  ];
+
+  // 基于日期的确定性选择（每天同一个模型）
+  var today = new Date();
+  var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+  var modelIndex = dayOfYear % MODELS.length;
+  var model = MODELS[modelIndex];
+  var parts = model.split('-');
+  var num = parts[0];
+  var name = parts.slice(1).join('-');
+
+  // 缓存
+  var cacheKey = 'ai_daily_' + today.toISOString().split('T')[0];
+  var cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    content.innerHTML = cached;
+    return;
+  }
+
+  var prompt = '今天是' + today.getFullYear() + '年' + (today.getMonth()+1) + '月' + today.getDate() + '日。' +
+    '今日思维模型：#' + num + ' ' + name + '。\n\n' +
+    '请完成以下任务（直接输出，不要任何前缀）：\n\n' +
+    '第一段「今日洞察」：用一段富有洞察力的话（80-120字），将这个模型与今天的日期、季节、工作节奏或当下人们的心态联系起来。要有画面感，能让人停下来思考。不要说教，要像一个智慧的朋友在耳边轻声说一句话。\n\n' +
+    '第二段「今日挑战」：用一句话（不超过30字）给出一个今天可以实践这个模型的小行动。';
+
+  fetch(DAILY_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'ask',
+      question: prompt,
+      history: [],
+      pageContext: { title: '首页', summary: '每日模型', url: '/' }
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.answer) { content.innerHTML = ''; return; }
+
+    var lines = data.answer.split('\n').filter(function(l) { return l.trim(); });
+    var insight = '';
+    var challenge = '';
+
+    // 解析两段内容
+    var insightLines = [];
+    var challengeLines = [];
+    var section = 'insight';
+    lines.forEach(function(line) {
+      line = line.replace(/^[\d]+[.、]?\s*/, '').replace(/^\*\*.*?\*\*\s*/, '').trim();
+      if (!line) return;
+      if (line.indexOf('今日挑战') !== -1 || line.indexOf('实践') !== -1 || line.indexOf('行动') !== -1) {
+        section = 'challenge';
+        line = line.replace(/今日挑战[：:]?\s*/, '').replace(/实践[：:]?\s*/, '').replace(/行动[：:]?\s*/, '');
+      }
+      if (section === 'insight') insightLines.push(line);
+      else challengeLines.push(line);
+    });
+
+    insight = insightLines.join(' ');
+    challenge = challengeLines.join(' ');
+
+    var html = '<div class="ai-daily-num">#' + num + '</div>' +
+      '<div class="ai-daily-name"><a href="/models/' + encodeURIComponent(model) + '/">' + name + '</a></div>' +
+      '<div class="ai-daily-quote">"' + insight + '"</div>';
+
+    if (challenge) {
+      html += '<div class="ai-daily-prompt">💡 今日挑战：' + challenge + '</div>';
+    }
+
+    html += '<a class="ai-daily-cta" href="/models/' + encodeURIComponent(model) + '/">深入阅读 →</a>';
+    content.innerHTML = html;
+    try { localStorage.setItem(cacheKey, html); } catch(e) {}
+  })
+  .catch(function() { content.innerHTML = ''; });
+})();
+</script>

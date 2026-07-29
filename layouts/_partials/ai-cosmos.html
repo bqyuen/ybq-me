@@ -1,0 +1,215 @@
+{{- /* AI 深空宇宙 — 星幕 + 神圣几何 + 能量波 + 智慧光晕 */ -}}
+{{- if not (eq .Layout "search") -}}
+<canvas id="ai-cosmos-canvas"></canvas>
+<div id="ai-sacred-geometry"></div>
+
+<style>
+/* 深空画布 */
+#ai-cosmos-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: -1;
+  opacity: 0.6;
+}
+
+/* 神圣几何叠加 */
+#ai-sacred-geometry {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: -1;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='100' cy='10' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='178' cy='55' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='178' cy='145' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='100' cy='190' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='22' cy='145' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3Ccircle cx='22' cy='55' r='90' fill='none' stroke='%23C89F65' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: sacredRotate 120s linear infinite;
+}
+@keyframes sacredRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* 智慧光晕 */
+.top10-card, .toolbox-card, .recent-card {
+  position: relative;
+}
+.top10-card::before, .toolbox-card::before, .recent-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(200,159,101,.15), transparent 50%, rgba(100,160,200,.1));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  filter: blur(8px);
+}
+.top10-card:hover::before, .toolbox-card:hover::before, .recent-card:hover::before {
+  opacity: 1;
+}
+
+/* 内容能量波 */
+.energy-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,159,101,.15), transparent 70%);
+  pointer-events: none;
+  animation: energyExpand 1s ease-out forwards;
+  z-index: -1;
+}
+@keyframes energyExpand {
+  from { width: 0; height: 0; opacity: 1; }
+  to { width: 300px; height: 300px; opacity: 0; }
+}
+
+/* 深邃文字光晕 */
+.post-content h2, .post-content h3 {
+  text-shadow: 0 0 30px rgba(200,159,101,.08);
+}
+
+/* 神秘边框 */
+.post-content blockquote {
+  border-left-color: rgba(200,159,101,.4) !important;
+  box-shadow: inset 3px 0 15px rgba(200,159,101,.05);
+}
+
+/* 星图页面特殊效果 */
+.graph-container {
+  background: radial-gradient(ellipse at center, rgba(10,15,30,.95), rgba(5,8,20,1));
+}
+
+/* 深色主题增强 */
+[data-theme="dark"] #ai-cosmos-canvas { opacity: 0.8; }
+[data-theme="dark"] #ai-sacred-geometry { opacity: 0.05; }
+[data-theme="dark"] .post-content h2 { text-shadow: 0 0 40px rgba(200,159,101,.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  #ai-cosmos-canvas, #ai-sacred-geometry { display: none; }
+}
+</style>
+
+<script>
+(function() {
+  var canvas = document.getElementById('ai-cosmos-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W, H;
+  var stars = [];
+  var nebulae = [];
+  var STAR_COUNT = 80;
+  var NEBULA_COUNT = 3;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // 生成星星
+  for (var i = 0; i < STAR_COUNT; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      size: 0.5 + Math.random() * 1.5,
+      alpha: 0.2 + Math.random() * 0.6,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.005 + Math.random() * 0.02,
+      hue: 35 + Math.random() * 30, // 金色到蓝白色
+      drift: (Math.random() - 0.5) * 0.05
+    });
+  }
+
+  // 生成星云
+  for (var j = 0; j < NEBULA_COUNT; j++) {
+    nebulae.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      radius: 150 + Math.random() * 200,
+      hue: 30 + Math.random() * 40,
+      alpha: 0.02 + Math.random() * 0.03,
+      drift: { x: (Math.random() - 0.5) * 0.1, y: (Math.random() - 0.5) * 0.1 }
+    });
+  }
+
+  var time = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    time += 0.01;
+
+    // 绘制星云
+    nebulae.forEach(function(n) {
+      n.x += n.drift.x;
+      n.y += n.drift.y;
+      if (n.x < -n.radius) n.x = W + n.radius;
+      if (n.x > W + n.radius) n.x = -n.radius;
+      if (n.y < -n.radius) n.y = H + n.radius;
+      if (n.y > H + n.radius) n.y = -n.radius;
+
+      var grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius);
+      grad.addColorStop(0, 'hsla(' + n.hue + ', 60%, 50%, ' + (n.alpha * 1.5) + ')');
+      grad.addColorStop(0.5, 'hsla(' + n.hue + ', 40%, 30%, ' + (n.alpha * 0.5) + ')');
+      grad.addColorStop(1, 'hsla(' + n.hue + ', 20%, 10%, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(n.x - n.radius, n.y - n.radius, n.radius * 2, n.radius * 2);
+    });
+
+    // 绘制星星
+    stars.forEach(function(s) {
+      s.pulse += s.pulseSpeed;
+      s.x += s.drift;
+      if (s.x < 0) s.x = W;
+      if (s.x > W) s.x = 0;
+
+      var a = s.alpha * (0.5 + 0.5 * Math.sin(s.pulse));
+
+      // 星星核心
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'hsla(' + s.hue + ', 70%, 80%, ' + a + ')';
+      ctx.fill();
+
+      // 星星光晕
+      if (s.size > 1) {
+        var glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 4);
+        glow.addColorStop(0, 'hsla(' + s.hue + ', 60%, 70%, ' + (a * 0.3) + ')');
+        glow.addColorStop(1, 'hsla(' + s.hue + ', 40%, 50%, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(s.x - s.size * 4, s.y - s.size * 4, s.size * 8, s.size * 8);
+      }
+    });
+
+    // 连线（距离近的星星之间）
+    ctx.strokeStyle = 'rgba(200,159,101,0.03)';
+    ctx.lineWidth = 0.5;
+    for (var i = 0; i < stars.length; i++) {
+      for (var j = i + 1; j < stars.length; j++) {
+        var dx = stars[i].x - stars[j].x;
+        var dy = stars[i].y - stars[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.globalAlpha = (1 - dist / 120) * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(stars[i].x, stars[i].y);
+          ctx.lineTo(stars[j].x, stars[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+
+  // === 滚动能量波 ===
+  var energyThrottle = false;
+  window.addEventListener('scroll', function() {
+    if (energyThrottle) return;
+    energyThrottle = true;
+    setTimeout(function() { energyThrottle = false; }, 300);
+
+    // 在视口中心释放能量波
+    var wave = document.createElement('div');
+    wave.className = 'energy-wave';
+    wave.style.left = (W / 2 - 150) + 'px';
+    wave.style.top = (window.scrollY + H / 2 - 150) + 'px';
+    document.body.appendChild(wave);
+    setTimeout(function() { wave.remove(); }, 1000);
+  }, { passive: true });
+})();
+</script>
+{{- end -}}

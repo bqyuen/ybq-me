@@ -1,0 +1,136 @@
+{{- /* AI 理解测试 — 每篇文章底部的开放思考题 */ -}}
+{{- if and (eq .Section "models") (not (eq .Layout "search")) -}}
+<section class="ai-quiz" id="ai-quiz">
+  <div class="ai-quiz-header">
+    <span class="ai-quiz-icon">🧪</span>
+    <h3 class="ai-quiz-title">读完检验</h3>
+    <p class="ai-quiz-subtitle">用你自己的话回答，AI 会给你反馈</p>
+  </div>
+  <div class="ai-quiz-question" id="ai-quiz-question">正在生成思考题…</div>
+  <form class="ai-quiz-form" id="ai-quiz-form" autocomplete="off">
+    <textarea class="ai-quiz-input" id="ai-quiz-input" placeholder="写下你的思考…" rows="3" maxlength="1000"></textarea>
+    <button type="submit" class="ai-quiz-submit">让 AI 点评</button>
+  </form>
+  <div class="ai-quiz-feedback" id="ai-quiz-feedback"></div>
+</section>
+
+<style>
+.ai-quiz {
+  margin: 2rem auto 0; max-width: 720px;
+  padding: 2rem; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(62,142,126,.06), rgba(200,159,101,.06));
+  border: 1px solid rgba(62,142,126,.15);
+}
+.ai-quiz-header { text-align: center; margin-bottom: 1.5rem; }
+.ai-quiz-icon { font-size: 28px; display: block; margin-bottom: 8px; }
+.ai-quiz-title { font-size: 1.1rem; font-weight: 700; color: var(--content, #333); margin: 0; }
+.ai-quiz-subtitle { font-size: 0.85rem; color: var(--secondary, #999); margin-top: 4px; }
+.ai-quiz-question {
+  font-size: 15px; line-height: 1.7; color: var(--content, #444);
+  padding: 1rem 1.2rem; margin-bottom: 1.5rem;
+  background: rgba(255,255,255,.5); border-radius: 12px;
+  border-left: 3px solid rgba(62,142,126,.3);
+}
+.ai-quiz-form { margin-bottom: 1rem; }
+.ai-quiz-input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--border, #ddd);
+  background: var(--theme, #fff); color: var(--content, #333);
+  font-size: 14px; line-height: 1.6; resize: vertical;
+  outline: none; transition: border-color .2s;
+  box-sizing: border-box;
+}
+.ai-quiz-input:focus { border-color: #3e8e7e; }
+.ai-quiz-input::placeholder { color: var(--secondary, #bbb); }
+.ai-quiz-submit {
+  margin-top: 10px; padding: 10px 20px; border-radius: 10px;
+  border: none; background: #3e8e7e; color: #fff;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all .2s;
+}
+.ai-quiz-submit:hover { background: #2d6b5a; transform: translateY(-1px); }
+.ai-quiz-feedback {
+  padding: 1.2rem; border-radius: 12px;
+  background: var(--theme, #fff); border: 1px solid var(--border, #eee);
+  font-size: 14px; line-height: 1.7; color: var(--content, #444);
+  display: none;
+}
+.ai-quiz-feedback.show { display: block; animation: quizIn .3s ease-out; }
+@keyframes quizIn { from { opacity: 0; transform: translateY(8px); } }
+.ai-quiz-feedback strong { color: #3e8e7e; }
+</style>
+
+<script>
+(function() {
+  var QUIZ_API = 'https://ybq-me-ai.garyyuen.workers.dev';
+  var questionEl = document.getElementById('ai-quiz-question');
+  var form = document.getElementById('ai-quiz-form');
+  var input = document.getElementById('ai-quiz-input');
+  var feedbackEl = document.getElementById('ai-quiz-feedback');
+  if (!questionEl) return;
+
+  var title = document.title.replace(/\s*[|\-·].*$/, '').trim();
+  var article = document.querySelector('.post-content');
+  var content = article ? article.innerText.substring(0, 2000) : '';
+
+  // 缓存问题
+  var cacheKey = 'ai_quiz_' + window.location.pathname;
+  var cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    questionEl.textContent = cached;
+  } else {
+    // 生成思考题
+    fetch(QUIZ_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'ask',
+        question: '基于「' + title + '」出一道开放性思考题，要求结合工作生活经历回答，是应用题不是记忆题，50字以内。直接输出。',
+        history: [],
+        pageContext: { title: title, summary: '思考题', url: window.location.pathname }
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.answer) {
+        var q = data.answer.replace(/^["「""']|["」""']$/g, '').trim();
+        questionEl.textContent = q;
+        try { localStorage.setItem(cacheKey, q); } catch(e) {}
+      }
+    });
+  }
+
+  // 提交回答
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var answer = input.value.trim();
+    if (!answer) return;
+
+    feedbackEl.innerHTML = '<div style="text-align:center;color:var(--secondary,#999)">✦ AI 正在思考你的回答…</div>';
+    feedbackEl.classList.add('show');
+
+    fetch(QUIZ_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'ask',
+        question: '用户学了「' + title + '」。思考题：' + questionEl.textContent + '。用户回答：' + answer + '。请150字内给反馈：肯定好的洞察，补充一个深化角度，用模型框架分析，最后鼓励。',
+        history: [],
+        pageContext: { title: title, summary: '思考题反馈', url: window.location.pathname }
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.answer) {
+        feedbackEl.innerHTML = data.answer.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      } else {
+        feedbackEl.innerHTML = '暂时无法给出反馈，请稍后再试。';
+      }
+    })
+    .catch(function() {
+      feedbackEl.innerHTML = '网络错误，请稍后重试。';
+    });
+  });
+})();
+</script>
+{{- end -}}

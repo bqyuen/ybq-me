@@ -5,6 +5,7 @@ showSummary: false
 linkTitle: "首页"
 ---
 
+<div class="hero-with-daily">
 <section class="hero reveal">
   <div class="hero-main">
     <p class="hero-eyebrow">GARY 的认知游乐场</p>
@@ -23,6 +24,14 @@ linkTitle: "首页"
     <div class="hero-stat"><span class="hero-stat-num" data-count="5">5</span><span class="hero-stat-label">个栏目</span></div>
   </div>
 </section>
+
+<div class="hero-daily-side" id="ai-daily-inline">
+  <div class="hero-daily-badge">📅 今日模型</div>
+  <div class="hero-daily-content" id="ai-daily-content-inline">
+    <div class="hero-daily-loading">✦ 正在挑选…</div>
+  </div>
+</div>
+</div>
 
 <section class="home-band band--warm reveal">
   <h2 class="band-title">🔥 镇站十篇 · 先从这里开始</h2>

@@ -1,6 +1,14 @@
 /* 长文阅读体验优化 */
+:root {
+  --main-width: 1000px !important;
+}
+
+.main {
+  max-width: calc(1000px + var(--gap) * 2) !important;
+}
+
 .post-content {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -55,6 +63,108 @@
   margin-top: 3em;
   padding-top: 2em;
   border-top: 1px solid var(--border);
+}
+
+/* ===== 首页 Hero + 每日模型并排 ===== */
+.hero-with-daily {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: stretch;
+  margin: 0.6em 0 1.2em;
+}
+.hero-with-daily .hero {
+  margin: 0;
+  min-width: 0;
+}
+.hero-daily-side {
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(300px 200px at 80% 20%, rgba(200, 159, 101, 0.1), transparent 60%),
+    var(--entry);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .hero-with-daily {
+    grid-template-columns: 1fr;
+  }
+  .hero-daily-side {
+    order: -1;
+  }
+}
+.hero-daily-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: rgba(200,159,101,.15);
+  color: #C89F65;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+.hero-daily-loading {
+  color: var(--secondary, #999);
+  font-size: 13px;
+}
+.hero-daily-content .ai-daily-num {
+  font-size: 12px;
+  color: #C89F65;
+  font-weight: 700;
+}
+.hero-daily-content .ai-daily-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--content, #222);
+  margin: 4px 0 8px;
+}
+.hero-daily-content .ai-daily-name a {
+  color: inherit;
+  text-decoration: none;
+}
+.hero-daily-content .ai-daily-name a:hover {
+  color: #C89F65;
+}
+.hero-daily-content .ai-daily-quote {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--content, #555);
+  font-style: italic;
+  border-left: 2px solid rgba(200,159,101,.3);
+  padding-left: 10px;
+  margin-bottom: 8px;
+}
+.hero-daily-content .ai-daily-prompt {
+  font-size: 12px;
+  color: var(--secondary, #888);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.hero-daily-content .ai-daily-cta {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(200,159,101,.12);
+  color: #C89F65;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .2s;
+}
+.hero-daily-content .ai-daily-cta:hover {
+  background: rgba(200,159,101,.22);
+}
+@media (max-width: 768px) {
+  .hero-with-daily {
+    flex-direction: column;
+  }
+  .hero-daily-side {
+    flex: none;
+  }
 }
 
 /* ===== 首页 Hero 区 ===== */

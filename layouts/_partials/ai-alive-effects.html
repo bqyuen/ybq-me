@@ -1,0 +1,133 @@
+{{- /* AI 生命效果 — 时间感知 + 滚动呼吸 + 知识脉冲 */ -}}
+{{- if not (eq .Layout "search") -}}
+<style>
+/* 滚动呼吸动画 */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(.25,.46,.45,.94), transform 0.8s cubic-bezier(.25,.46,.45,.94);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* 内容块呼吸 */
+.post-content > p, .post-content > h2, .post-content > h3, .post-content > blockquote {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* 模型卡片脉冲 */
+.top10-card, .toolbox-card, .recent-card, .cat-chip {
+  transition: all 0.3s cubic-bezier(.25,.46,.45,.94);
+}
+.top10-card:hover, .toolbox-card:hover, .recent-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(200,159,101,.15);
+}
+
+/* 链接呼吸 */
+a[href*="/models/"] {
+  position: relative;
+  transition: color 0.2s;
+}
+a[href*="/models/"]::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: rgba(200,159,101,.3);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+a[href*="/models/"]:hover::after {
+  transform: scaleX(1);
+}
+
+/* 知识脉冲 — hover 模型链接时的发光效果 */
+.knowledge-pulse {
+  animation: kpulse 0.6s ease-out;
+}
+@keyframes kpulse {
+  0% { box-shadow: 0 0 0 0 rgba(200,159,101,.4); }
+  100% { box-shadow: 0 0 0 20px rgba(200,159,101,0); }
+}
+
+/* 页面加载入场 */
+.page-enter {
+  animation: pageEnter 0.8s cubic-bezier(.25,.46,.45,.94);
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 光晕效果 */
+.glow-text {
+  text-shadow: 0 0 20px rgba(200,159,101,.2);
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  // === 时间感知 ===
+  var hour = new Date().getHours();
+  var timeClass = '';
+  var timeGreeting = '';
+
+  if (hour >= 5 && hour < 9) {
+    timeClass = 'time-morning';
+    timeGreeting = '早安，新的一天从一个好思维开始';
+  } else if (hour >= 9 && hour < 12) {
+    timeClass = 'time-forenoon';
+    timeGreeting = '上午好，这是思维最清晰的时段';
+  } else if (hour >= 12 && hour < 14) {
+    timeClass = 'time-noon';
+    timeGreeting = '午间休息，读一个模型放松一下';
+  } else if (hour >= 14 && hour < 18) {
+    timeClass = 'time-afternoon';
+    timeGreeting = '下午好，用一个模型解决今天的难题';
+  } else if (hour >= 18 && hour < 22) {
+    timeClass = 'time-evening';
+    timeGreeting = '晚上好，今晚学点什么？';
+  } else {
+    timeClass = 'time-night';
+    timeGreeting = '深夜了，读一个模型就去休息吧';
+  }
+  document.documentElement.classList.add(timeClass);
+
+  // 将问候语传给光团
+  window.__aiTimeGreeting = timeGreeting;
+
+  // === 滚动入场 ===
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  reveals.forEach(function(el) { observer.observe(el); });
+
+  // === 知识脉冲 ===
+  document.addEventListener('mouseover', function(e) {
+    var link = e.target.closest('a[href*="/models/"]');
+    if (!link) return;
+    link.classList.add('knowledge-pulse');
+    setTimeout(function() { link.classList.remove('knowledge-pulse'); }, 600);
+  });
+
+  // === 页面入场 ===
+  document.body.classList.add('page-enter');
+
+  // === 深夜模式（降低亮度） ===
+  if (hour >= 23 || hour < 5) {
+    document.documentElement.style.filter = 'brightness(0.92)';
+  }
+})();
+</script>
+{{- end -}}

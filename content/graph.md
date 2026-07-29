@@ -21,7 +21,7 @@ description: "100 个思维模型 · 10 大分类 · 353 组关联 —— 一张
     <div class="nebula nebula-b"></div>
     <div id="graph-loading"><div class="graph-spinner"></div><div class="graph-loading-text">正在绘制知识星图…</div></div>
     <div id="graph-vignette"></div>
-    <div id="graph-hint">滚轮缩放 · 拖动平移 · 单击节点查看详情</div>
+    <div id="graph-hint">滚轮缩放 · 拖动平移 · 单击节点查看详情 · 拖拽定住 · 双击释放</div>
     <div id="graph-zoomctl">
       <button id="gz-in" type="button" aria-label="放大">＋</button>
       <button id="gz-out" type="button" aria-label="缩小">－</button>
@@ -64,7 +64,7 @@ description: "100 个思维模型 · 10 大分类 · 353 组关联 —— 一张
 .gs-item .gs-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 .gs-item .gs-num { color: var(--secondary, #999); font-size: 12px; }
 .gs-item .gs-cat { margin-left: auto; color: var(--secondary, #999); font-size: 11px; }
-#graph-container { width: 100%; height: 82vh; min-height: 560px; border-radius: 18px; background: var(--code-bg, #f8f8f8); border: 1px solid var(--border, #eee); position: relative; overflow: hidden; box-shadow: 0 12px 44px rgba(20, 30, 50, .07); }
+#graph-container { width: 100%; height: 86vh; min-height: 580px; border-radius: 18px; background: var(--code-bg, #f8f8f8); border: 1px solid var(--border, #eee); position: relative; overflow: hidden; box-shadow: 0 12px 44px rgba(20, 30, 50, .07); }
 .nebula { position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(40px); pointer-events: none; z-index: 1; }
 .nebula-a { top: -160px; right: -100px; background: radial-gradient(circle, rgba(200,159,101,.12), transparent 62%); }
 .nebula-b { bottom: -180px; left: -120px; background: radial-gradient(circle, rgba(52,100,122,.11), transparent 62%); }
@@ -83,8 +83,6 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
 #graph-zoomctl button:active { transform: translateY(0) scale(.94); }
 #graph-container svg { display: block; cursor: grab; }
 #graph-container svg:active { cursor: grabbing; }
-.graph-breathe { animation: breathe 9s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
-@keyframes breathe { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.012) translate(-5px, 4px); } }
 .grid-dot { fill: var(--border, #e2e2e2); opacity: .5; }
 .graph-link { fill: none; stroke: var(--secondary, #9aa3af); transition: stroke-opacity .35s ease, stroke-width .35s ease; }
 .graph-link.hl { stroke: #C89F65; stroke-opacity: .95 !important; stroke-width: 2.2px !important; }
@@ -210,23 +208,24 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
     });
 
     var topIds = nodes.slice().sort(function (a, b) { return b.deg - a.deg; })
-      .slice(0, 18).map(function (n) { return n.id; });
+      .slice(0, 25).map(function (n) { return n.id; });
     var alwaysLabel = new Set(topIds);
 
     var cats = data.categories.map(function (c) { return c.name; });
     var cx = width / 2, cy = height / 2;
-    var clusterR = Math.min(width, height) * 0.36;
+    var clusterRx = width * 0.48;
+    var clusterRy = height * 0.40;
     var catCenter = {};
     cats.forEach(function (c, i) {
       var a = (i / cats.length) * Math.PI * 2 - Math.PI / 2;
-      catCenter[c] = { x: cx + clusterR * Math.cos(a), y: cy + clusterR * Math.sin(a) };
+      catCenter[c] = { x: cx + clusterRx * Math.cos(a), y: cy + clusterRy * Math.sin(a) };
     });
 
-    // 初始位置：从各自分类的星团中心绽放
+    // 初始位置：从各自分类的星团中心绽放，横向更宽
     nodes.forEach(function (d) {
       var c = catCenter[d.cat] || { x: cx, y: cy };
-      d.x = c.x + (Math.random() - 0.5) * 46;
-      d.y = c.y + (Math.random() - 0.5) * 46;
+      d.x = c.x + (Math.random() - 0.5) * 340;
+      d.y = c.y + (Math.random() - 0.5) * 200;
     });
 
     var svg = d3.select(container).append('svg')
@@ -240,29 +239,29 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
     svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'url(#graph-dotgrid)');
 
     var gZoom = svg.append('g');
-    var g = gZoom.append('g').attr('class', 'graph-breathe');
+    var g = gZoom.append('g');
 
     var zoom = d3.zoom()
-      .scaleExtent([0.35, 4])
+      .scaleExtent([0.2, 4])
       .on('zoom', function (event) {
         gZoom.attr('transform', event.transform);
-        container.classList.toggle('zoomed', event.transform.k > 1.5);
+        container.classList.toggle('zoomed', event.transform.k > 1.2);
       });
     svg.call(zoom);
 
     // 初始视野略微拉远，给摊开的星图留出呼吸边距
-    svg.call(zoom.transform, d3.zoomIdentity.translate(width * 0.055, height * 0.055).scale(0.89));
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width * 0.02, height * 0.02).scale(0.78));
 
     var simulation = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(82).strength(0.42))
-      .force('charge', d3.forceManyBody().strength(-150))
-      .force('collision', d3.forceCollide().radius(function (d) { return radius(d) + 14; }))
-      .force('x', d3.forceX(function (d) { return (catCenter[d.cat] || { x: cx }).x; }).strength(0.075))
-      .force('y', d3.forceY(function (d) { return (catCenter[d.cat] || { y: cy }).y; }).strength(0.075))
+      .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(130).strength(0.28))
+      .force('charge', d3.forceManyBody().strength(-320))
+      .force('collision', d3.forceCollide().radius(function (d) { return radius(d) + 20; }))
+      .force('x', d3.forceX(function (d) { return (catCenter[d.cat] || { x: cx }).x; }).strength(0.035))
+      .force('y', d3.forceY(function (d) { return (catCenter[d.cat] || { y: cy }).y; }).strength(0.025))
       .force('center', d3.forceCenter(cx, cy))
       .alpha(0.9)
-      .alphaDecay(0.02)
-      .velocityDecay(0.5);
+      .alphaDecay(0.015)
+      .velocityDecay(0.45);
 
     function radius(d) { return 4.5 + Math.sqrt(d.deg || 1) * 2.1; }
 
@@ -277,14 +276,20 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
       .attr('class', 'graph-node')
       .call(d3.drag()
         .on('start', function (event, d) {
-          if (!event.active) simulation.alphaTarget(0.22).restart();
+          if (!event.active) simulation.alphaTarget(0.15).restart();
           d.fx = d.x; d.fy = d.y;
         })
         .on('drag', function (event, d) { d.fx = event.x; d.fy = event.y; })
         .on('end', function (event, d) {
           if (!event.active) simulation.alphaTarget(0);
-          d.fx = null; d.fy = null;
-        }));
+          // 定住：节点停在拖拽位置，不复位
+        }))
+      .on('dblclick', function (event, d) {
+        event.stopPropagation();
+        // 双击释放：节点重新被力牵引
+        d.fx = null; d.fy = null;
+        simulation.alpha(0.3).restart();
+      });
 
     // 高连接节点的星光光晕（先画，垫在核心下面）
     node.filter(function (d) { return alwaysLabel.has(d.id); })
@@ -297,7 +302,8 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
     node.append('circle')
       .attr('class', 'core')
       .attr('r', 0)
-      .attr('fill', function (d) { return color(d.cat); });
+      .attr('fill', function (d) { return color(d.cat); })
+      .style('animation-delay', function (d, i) { return (i * 0.07) + 's'; });
 
     node.append('text')
       .attr('class', function (d) { return 'graph-label' + (alwaysLabel.has(d.id) ? ' hi' : ''); })
@@ -538,6 +544,50 @@ body.dark #graph-vignette { background: radial-gradient(ellipse at center, trans
       });
       node.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
     });
+
+    // ── 有机生命动画（JS 驱动，非 CSS）──
+    var aliveNodes = nodes.map(function (n, i) {
+      return {
+        el: null,
+        phase: Math.random() * Math.PI * 2,
+        speedX: 0.4 + Math.random() * 0.9,
+        speedY: 0.3 + Math.random() * 0.8,
+        ampX: 2.5 + Math.random() * 4.0,
+        ampY: 2.0 + Math.random() * 3.5,
+        speedS: 0.2 + Math.random() * 0.5,
+        ampS: 0.03 + Math.random() * 0.05,
+        speedO: 0.15 + Math.random() * 0.45,
+        ampO: 0.10 + Math.random() * 0.18
+      };
+    });
+    node.each(function (d, i) { aliveNodes[i].el = d3.select(this); });
+
+    var aliveLinks = links.map(function (l, i) {
+      return { el: null, phase: Math.random() * Math.PI * 2, speed: 0.1 + Math.random() * 0.35, amp: 0.12 + Math.random() * 0.18 };
+    });
+    link.each(function (d, i) { if (aliveLinks[i]) aliveLinks[i].el = d3.select(this); });
+
+    var lifeStart = performance.now();
+    function lifeLoop(t) {
+      var sec = (t - lifeStart) / 1000;
+      aliveNodes.forEach(function (n) {
+        if (!n.el || pinned && pinned.id === n.el.datum().id) return; // 被拖拽的节点不动
+        var dx = Math.sin(sec * n.speedX + n.phase) * n.ampX;
+        var dy = Math.cos(sec * n.speedY + n.phase * 1.3) * n.ampY;
+        var s = 1 + Math.sin(sec * n.speedS + n.phase * 0.7) * n.ampS;
+        var o = 0.85 + Math.sin(sec * n.speedO + n.phase * 1.1) * n.ampO;
+        n.el.select('.core')
+          .attr('transform', 'translate(' + dx + ',' + dy + ') scale(' + s + ')')
+          .style('opacity', o);
+      });
+      aliveLinks.forEach(function (l) {
+        if (!l.el) return;
+        var o = 0.7 + Math.sin(sec * l.speed + l.phase) * l.amp;
+        l.el.style('opacity', o);
+      });
+      requestAnimationFrame(lifeLoop);
+    }
+    requestAnimationFrame(lifeLoop);
 
     // 分类图例
     legendEl.innerHTML = '';

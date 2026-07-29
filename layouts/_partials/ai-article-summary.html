@@ -1,0 +1,73 @@
+{{- /* AI 文章摘要 — 每篇文章顶部的一句话精华 */ -}}
+{{- if and (eq .Section "models") (not (eq .Layout "search")) -}}
+<div class="ai-summary-bar" id="ai-summary-bar">
+  <span class="ai-summary-icon">✦</span>
+  <span class="ai-summary-text" id="ai-summary-text">正在生成 AI 摘要…</span>
+</div>
+
+<style>
+.ai-summary-bar {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px 18px; margin-bottom: 1.5rem;
+  background: rgba(200,159,101,.08);
+  border: 1px solid rgba(200,159,101,.15);
+  border-radius: 12px;
+  font-size: 14px; line-height: 1.6;
+  color: var(--content, #555);
+  animation: summaryFadeIn .5s ease-out;
+}
+@keyframes summaryFadeIn { from { opacity: 0; transform: translateY(-8px); } }
+.ai-summary-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.ai-summary-text { flex: 1; }
+.ai-summary-text strong { color: #C89F65; }
+</style>
+
+<script>
+(function() {
+  var SUMMARY_API = 'https://ybq-me-ai.garyyuen.workers.dev';
+  var textEl = document.getElementById('ai-summary-text');
+  if (!textEl) return;
+
+  // 获取文章内容
+  var article = document.querySelector('.post-content');
+  if (!article) return;
+  var content = article.innerText.substring(0, 1500);
+  var title = document.title.replace(/\s*[|\-·].*$/, '').trim();
+
+  // 从 localStorage 检查缓存
+  var cacheKey = 'ai_summary_' + window.location.pathname;
+  var cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    textEl.innerHTML = cached;
+    return;
+  }
+
+  // 请求 AI 摘要
+  fetch(SUMMARY_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'ask',
+      question: '请用一句话（不超过50字）概括这篇文章的核心洞察。直接输出概括，不要任何前缀或解释。',
+      history: [],
+      pageContext: { title: title, summary: content.substring(0, 500), url: window.location.pathname }
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.answer) {
+      var summary = data.answer.replace(/^[「""']|[」""']$/g, '').trim();
+      textEl.innerHTML = '<strong>AI 摘要：</strong>' + summary;
+      try { localStorage.setItem(cacheKey, textEl.innerHTML); } catch(e) {}
+    } else {
+      textEl.textContent = '';
+      document.getElementById('ai-summary-bar').style.display = 'none';
+    }
+  })
+  .catch(function() {
+    textEl.textContent = '';
+    document.getElementById('ai-summary-bar').style.display = 'none';
+  });
+})();
+</script>
+{{- end -}}

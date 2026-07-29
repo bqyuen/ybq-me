@@ -1,0 +1,132 @@
+{{- /* AI 实时案例 — 第一个真实案例 + 后续AI生成 */ -}}
+{{- if and (eq .Section "models") (not (eq .Layout "search")) -}}
+<div class="ai-case" id="ai-case">
+  <button class="ai-case-btn" id="ai-case-btn">
+    <span class="ai-case-icon">📰</span>
+    <span>给我一个真实案例</span>
+  </button>
+  <div class="ai-case-result" id="ai-case-result"></div>
+</div>
+
+<style>
+.ai-case { margin: 2rem 0; }
+.ai-case-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-radius: 12px;
+  border: 1px dashed rgba(200,159,101,.3);
+  background: rgba(200,159,101,.04);
+  color: #C89F65; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all .2s; width: 100%;
+  justify-content: center;
+}
+.ai-case-btn:hover {
+  background: rgba(200,159,101,.1);
+  border-color: rgba(200,159,101,.5);
+  transform: translateY(-1px);
+}
+.ai-case-btn:disabled { opacity: .6; cursor: not-allowed; }
+.ai-case-icon { font-size: 18px; }
+.ai-case-result {
+  margin-top: 1rem; padding: 1.5rem;
+  background: var(--entry, #f8f8f8);
+  border-radius: 14px; border: 1px solid var(--border, #eee);
+  font-size: 14px; line-height: 1.8; color: var(--content, #444);
+  display: none;
+}
+.ai-case-result.show { display: block; animation: caseIn .4s ease-out; }
+@keyframes caseIn { from { opacity: 0; transform: translateY(10px); } }
+.ai-case-result strong { color: #C89F65; }
+.ai-case-source {
+  display: block; margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border, #eee);
+  font-size: 12px; color: var(--secondary, #999);
+}
+.ai-case-source.real { color: #4CAF50; }
+.ai-case-source.ai { color: #FF9800; }
+</style>
+
+<script>
+(function() {
+  var CASE_API = 'https://ybq-me-ai.garyyuen.workers.dev';
+  var btn = document.getElementById('ai-case-btn');
+  var result = document.getElementById('ai-case-result');
+  if (!btn) return;
+
+  var title = document.title.replace(/\s*[|\-·].*$/, '').trim();
+  var modelId = decodeURIComponent(window.location.pathname.split('/').filter(Boolean).pop());
+  var clickCount = 0;
+
+  btn.addEventListener('click', function() {
+    clickCount++;
+    btn.disabled = true;
+
+    if (clickCount === 1) {
+      // 第一次：从KV获取真实历史案例
+      btn.querySelector('span:last-child').textContent = '✦ 正在获取真实案例…';
+      result.innerHTML = '<div style="text-align:center;color:var(--secondary,#999)">加载中…</div>';
+      result.classList.add('show');
+
+      fetch(CASE_API + '/api/case', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modelId: modelId })
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          btn.disabled = false;
+          btn.querySelector('span:last-child').textContent = '📰 换一个AI生成的例子';
+          if (data.case && data.case !== '暂无案例') {
+            var html = data.case
+              .replace(/\n/g, '<br>')
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html += '<span class="ai-case-source real">✅ 真实历史案例</span>';
+            result.innerHTML = html;
+          } else {
+            result.innerHTML = '暂无真实案例，点击下方按钮获取AI生成案例。';
+            btn.querySelector('span:last-child').textContent = '🤖 获取AI生成案例';
+          }
+        })
+        .catch(function() {
+          btn.disabled = false;
+          btn.querySelector('span:last-child').textContent = '🤖 获取AI生成案例';
+          result.innerHTML = '网络错误，请点击按钮重试。';
+        });
+    } else {
+      // 后续：调用AI生成
+      btn.querySelector('span:last-child').textContent = '✦ AI 正在生成…';
+
+      fetch(CASE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ask',
+          question: '用一个商业场景解释「' + title + '」，要有公司名和数字，100字。直接输出。',
+          history: [],
+          pageContext: { title: title, summary: 'AI案例生成', url: window.location.pathname }
+        })
+      })
+        .then(function(r) { console.log('[AI案例] 状态:', r.status); return r.json(); })
+        .then(function(data) {
+          console.log('[AI案例] 数据:', JSON.stringify(data).substring(0, 200));
+          btn.disabled = false;
+          btn.querySelector('span:last-child').textContent = '🔄 再换一个AI例子';
+          if (data.answer) {
+            var html = data.answer
+              .replace(/\n/g, '<br>')
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html += '<span class="ai-case-source ai">🤖 AI 生成案例（仅供参考，非真实事件）</span>';
+            result.innerHTML = html;
+          } else {
+            result.innerHTML = 'AI 暂时无法生成，请稍后再试。';
+          }
+        })
+        .catch(function() {
+          btn.disabled = false;
+          btn.querySelector('span:last-child').textContent = '🔄 再换一个AI例子';
+          result.innerHTML = '网络错误，请稍后重试。';
+        });
+    }
+  });
+})();
+</script>
+{{- end -}}
