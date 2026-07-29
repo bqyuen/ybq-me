@@ -7,6 +7,19 @@
 
 ## 2026-07-29
 
+### 11:38 部署（WorkBuddy · commit `7b293b1` · wrangler deploy）
+
+AI 助手面板三档尺寸调节（S/M/L）+ CHANGELOG 更新日志机制。
+
+| 变更 | 说明 |
+|------|------|
+| AI 助手 S/M/L 尺寸按钮 | 面板 header 新增三档切换：S=400×640（手机）、M=560×720（iPad）、L=720×800（电脑） |
+| 尺寸记忆 | localStorage 记住用户选择，下次打开自动恢复 |
+| 移动端适配 | <600px 隐藏按钮、强制全宽；601-1024px 大档自动收窄 |
+| docs/CHANGELOG.md | 新增更新日志文件，记录每次部署的变更摘要 |
+
+---
+
 ### 01:06 部署（Kimi Code · direct upload）
 
 **AI 功能全面上线**——Cloudflare Worker 后端 + 12 个前端 AI 组件。
