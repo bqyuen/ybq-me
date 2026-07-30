@@ -47,6 +47,9 @@ export default {
       if (action === 'suggest') {
         return await handleSuggest(body, env, ctx);
       }
+      if (action === 'learning-path') {
+        return await handleLearningPath(body, env, ctx);
+      }
       if (action === 'stats') {
         return await handleStats(body, env, ctx);
       }
@@ -235,6 +238,132 @@ ${relatedContext ? '## 网站相关文章\n' + relatedContext : ''}
   }
 
   return jsonResponse({ suggestions }, 200, env.ALLOWED_ORIGIN);
+}
+
+
+// === action=learning-path：基于用户目标生成个性化学习路径 ===
+async function handleLearningPath(body, env, ctx) {
+  const { goal } = body;
+
+  if (!goal || typeof goal !== 'string' || goal.trim().length === 0) {
+    return jsonResponse({ error: '请提供学习目标' }, 400);
+  }
+  if (goal.length > 200) {
+    return jsonResponse({ error: '学习目标过长，请精简到 200 字以内' }, 400);
+  }
+
+  // 获取全站文章索引
+  const indexUrl = `${env.SITE_URL}/index.json`;
+  const indexRes = await fetch(indexUrl);
+  if (!indexRes.ok) {
+    return jsonResponse({ error: '站点索引获取失败' }, 502);
+  }
+  const articles = await indexRes.json();
+
+  // 构建模型列表（只取 models/ 目录下的文章）
+  const models = articles
+    .filter(a => a.permalink && a.permalink.includes('/models/'))
+    .map(a => ({
+      id: a.permalink.match(/\/models\/([^/]+)/)?.[1] || '',
+      title: a.title || '',
+      summary: (a.summary || '').substring(0, 200),
+      tags: a.tags || [],
+    }))
+    .filter(m => m.id);
+
+  const systemPrompt = `你是 ybq.me 网站的学习路径规划师。用户想学习某个方向，你需要从 100 个思维模型中推荐最相关的学习路径。
+
+## 可用的思维模型（共 ${models.length} 个）
+${models.map(m => `- ${m.id}: ${m.title} — ${m.summary}`).join('\n')}
+
+## 任务
+根据用户的学习目标，推荐 5-8 个最相关的思维模型，按学习顺序排列。
+
+## 输出格式（严格 JSON）
+\`\`\`json
+{
+  "path_title": "学习路径标题",
+  "path_description": "路径简短描述（50字以内）",
+  "estimated_weeks": 2,
+  "steps": [
+    {
+      "model_id": "001-机会成本",
+      "reason": "为什么推荐这个模型（20字以内）",
+      "order": 1
+    }
+  ]
+}
+\`\`\`
+
+## 规则
+1. 只从上面列出的模型中选择，不要编造模型
+2. 按学习逻辑排序（基础→进阶→应用）
+3. 每个步骤给出简短的推荐理由
+4. 输出纯 JSON，不要任何额外说明`;
+
+  const llmRes = await fetch(`${env.LLM_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${env.MIMO_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: env.LLM_MODEL || 'mimo-v2.5',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `我的学习目标：${goal}` }
+      ],
+      max_completion_tokens: 1024,
+      temperature: 0.7,
+      top_p: 0.9,
+      stream: false,
+      thinking: { type: "disabled" },
+    }),
+  });
+
+  if (!llmRes.ok) {
+    const errText = await llmRes.text();
+    console.error('LLM error:', llmRes.status, errText);
+    return jsonResponse({ error: 'AI 服务暂时不可用，请稍后重试' }, 502);
+  }
+
+  const llmData = await llmRes.json();
+  const raw = llmData.choices?.[0]?.message?.content || '';
+
+  // 提取 usage 并异步写入 KV
+  const usage = llmData.usage || {};
+  if (ctx && ctx.waitUntil && env.STATS_KV) {
+    ctx.waitUntil(recordUsage(env, 'learning-path', usage.prompt_tokens || 0, usage.completion_tokens || 0));
+  }
+
+  // 解析 JSON 响应
+  let pathData;
+  try {
+    // 尝试从响应中提取 JSON
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      pathData = JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error('No JSON found in response');
+    }
+  } catch (e) {
+    console.error('JSON parse error:', e, 'raw:', raw);
+    return jsonResponse({ error: 'AI 响应格式错误，请重试' }, 500);
+  }
+
+  // 验证并补充模型信息
+  if (pathData.steps && Array.isArray(pathData.steps)) {
+    pathData.steps = pathData.steps.map(step => {
+      const model = models.find(m => m.id === step.model_id);
+      return {
+        ...step,
+        title: model?.title || step.model_id,
+        url: `${env.SITE_URL}/models/${step.model_id}/`,
+      };
+    });
+  }
+
+  return jsonResponse(pathData, 200, env.ALLOWED_ORIGIN);
 }
 
 
