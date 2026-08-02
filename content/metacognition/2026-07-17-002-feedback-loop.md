@@ -3,9 +3,9 @@ title: "每日核心 #002 · 反馈回路"
 date: 2026-07-17
 draft: false
 description: "思维模型 · 反馈回路的 4 种类型 + 制造业实战"
-tags: ["每日核心", "思维模型", "反馈回路", "系统思考"]
-categories: ["思维方法"]
-aliases: ["/blog/daily/2026-07-17-002-feedback-loop/"]
+tags: ["元认知", "思维模型", "反馈回路", "系统思考"]
+categories: ["元认知"]
+aliases: ["/blog/daily/2026-07-17-002-feedback-loop/", "/daily/2026-07-17-002-feedback-loop/"]
 
 cover:
     image: "/images/covers/2026-07-17-002-feedback-loop.png"

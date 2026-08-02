@@ -344,7 +344,7 @@ aliases: ["/ai-learning/path/"]
 </style>
 
 <script>
-const WORKER_URL = 'https://ybq-ai-search.workers.dev';
+const WORKER_URL = 'https://ybq-ai-search.garyyuen.workers.dev';
 
 function setGoal(goal) {
   document.getElementById('learning-goal').value = goal;

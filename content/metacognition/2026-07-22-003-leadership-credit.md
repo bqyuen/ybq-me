@@ -3,9 +3,9 @@ title: "每日核心 #003 · 驭人术：管理者最贵的资产是信用"
 date: 2026-07-22
 draft: false
 description: "管理心法 · 30 个驭人术五篇全图：立规矩、管关系、用人、拿捏人性、立威立信"
-tags: ["每日核心", "管理", "领导力", "驭人术", "团队管理"]
-categories: ["思维方法"]
-aliases: ["/blog/daily/2026-07-22-003-leadership-credit/"]
+tags: ["元认知", "管理", "领导力", "驭人术", "团队管理"]
+categories: ["元认知"]
+aliases: ["/blog/daily/2026-07-22-003-leadership-credit/", "/daily/2026-07-22-003-leadership-credit/"]
 
 cover:
     image: "/images/covers/2026-07-22-003-leadership-credit.png"

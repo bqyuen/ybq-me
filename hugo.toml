@@ -78,17 +78,13 @@ timeZone = "Asia/Shanghai"
     url = "/insights/"
     weight = 5
   [[menu.main]]
-    name = "📅 每日核心"
-    url = "/daily/"
+    name = "🧠 元认知"
+    url = "/metacognition/"
     weight = 6
-  [[menu.main]]
-    name = "⚖️ 对比"
-    url = "/compare/"
-    weight = 7
   [[menu.main]]
     name = "🔍 搜索"
     url = "/search/"
-    weight = 8
+    weight = 7
   [[menu.main]]
     name = "关于"
     url = "/about/"
@@ -109,7 +105,13 @@ timeZone = "Asia/Shanghai"
 
 # 输出配置
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS", "JSON", "robotsTXT"]
   section = ["HTML", "RSS"]
   taxonomy = ["HTML", "RSS"]
   term = ["HTML"]
+
+[outputFormats.robotsTXT]
+  mediaType = "text/plain"
+  baseName = "robots"
+  isPlainText = true
+  noIndex = true
