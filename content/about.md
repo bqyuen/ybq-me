@@ -52,7 +52,7 @@ aliases: ["/contact/"]
 
 ## 最近文章
 
-- 🎯 [把「专家」砍小到不好意思，半年后你就是专家](/ai-learning/half-year-expert/)  
+- 🎯 [把「专家」砍小到不好意思，半年后你就是专家](/learning/half-year-expert/)  
   普通人半年成为专家的底层方法：六步闭环 + 密度战。
 - 📉 [你存下的每一块钱，都在替一张永不到期的账单买单](/insights/global-debt-ledger/)  
   全球债务 348 万亿美元——一文看懂国债、通胀，以及你被悄悄稀释的存款。
