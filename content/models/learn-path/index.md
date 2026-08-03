@@ -1,7 +1,8 @@
 ---
-title: "AI 学习路径生成器"
+title: "学习路径生成器"
 date: 2026-07-30
 draft: false
+weight: -1
 description: "输入你想学的方向，AI 从 100+ 思维模型中为你规划个性化学习路径"
 tags: ["AI", "学习路径", "思维模型", "终身学习"]
 categories: ["学习方法"]

@@ -4,6 +4,20 @@
 > 格式：日期 · 部署时间 · 变更摘要 · 操作者
 
 ---
+## 2026-08-03
+
+### 18:33 部署（WorkBuddy · Pages Functions 同源代理）
+
+修复 AI 助手在部分网络环境下访问 `workers.dev` 失败的问题。
+
+| 变更 | 说明 |
+|------|------|
+| `functions/api/ai/[[path]].js` | 新增同源代理 `/api/ai`，统一转发 AI 请求，兼容主 AI Worker 与旧版搜索 Worker |
+| AI 前端组件 | 全部改用 `/api/ai`，避免浏览器直接连接 `workers.dev` |
+| 兼容接口 | `/api/ai/api/usage`、`/api/ai/api/evolution`、`/api/ai/api/track` 保持可用 |
+| 验证 | 推荐问题、全局自由提问、文章“相关模型”按钮均已在真实浏览器中返回回答 |
+
+---
 
 ## 2026-07-29
 

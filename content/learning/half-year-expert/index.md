@@ -2,15 +2,16 @@
 title: "把「专家」砍小到不好意思，半年后你就是专家"
 date: 2026-07-17
 draft: false
+weight: 53
 description: "普通人半年成为专家的底层方法：不是天赋，不是时间，而是把领域切到足够窄之后的六步闭环。"
 tags: ["学习方法", "刻意练习", "终身学习", "专家"]
-categories: ["思维进化"]
+categories: ["思维进化", "元认知"]
 cover:
     image: "cover.png"
     alt: "半年成为专家方法论信息图 · 从广而浅到窄而深"
     caption: "与其在十块地上各挖两下，不如在一个地方挖出一口井"
     relative: true
-aliases: ["/learn/half-year-expert/"]
+aliases: ["/ai-learning/half-year-expert/", "/learn/half-year-expert/", "/metacognition/half-year-expert/"]
 ---
 
 尼尔斯·玻尔说过一句话：专家，就是在一个非常狭窄的领域里，犯过所有可能错误的人。

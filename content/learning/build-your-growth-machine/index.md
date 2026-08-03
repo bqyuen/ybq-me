@@ -2,10 +2,11 @@
 title: "别再用意志力对抗人生了：真正的高手，都在偷偷组装一台「成长机器」"
 date: 2026-07-30
 draft: false
+weight: 55
 description: "同样24小时，有人轻松跨界成功，有人忙了十年却原地踏步。我们习惯归因于天赋和运气，但真相是：差距不在努力多少，而在你是否有一套能自我迭代的系统。本文拆解『散装努力』为何必然失败，以及高手如何用『机器思维』跑赢时间。"
 tags: ["个人系统", "复利思维", "杠杆", "习惯养成", "认知升级"]
-categories: ["学习方法"]
-aliases: ["/ai-learning/build-your-growth-machine/"]
+categories: ["学习方法", "元认知"]
+aliases: ["/ai-learning/build-your-growth-machine/", "/metacognition/build-your-growth-machine/"]
 cover:
     image: "cover.png"
     alt: "组装一台能自我运转的成长机器"

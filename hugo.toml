@@ -7,7 +7,7 @@ timeZone = "Asia/Shanghai"
 [language]
   [language.zh-cn]
     locale = "zh-CN"
-    languageDirection = "ltr"
+    direction = "ltr"
     weight = 1
 
 # 输出中文友好的 URL
@@ -21,7 +21,7 @@ timeZone = "Asia/Shanghai"
   keywords = ["终身学习", "思维模型", "AI", "ybq.me"]
   DateFormat = "2006-01-02"
   defaultTheme = "auto"
-  ShowReadingTime = true
+  ShowReadingTime = false
   # 注意：PaperMod 模板读取的参数名是 ShareButtons（不是 ShowShareButtons）
   # 空数组 = 关闭所有社交分享图标；完全注释掉这行 = 显示全部默认图标
   ShareButtons = []
@@ -37,7 +37,18 @@ timeZone = "Asia/Shanghai"
   hideSummary = false
   showtoc = true
   tocopen = false
-  mainSections = ["models", "ai-learning", "insights", "daily"]
+  # mainSections 已禁用——首页只显示 Hero，不自动渲染文章列表
+  # mainSections = ["models", "ai-learning", "insights", "daily"]
+  # profileMode 已禁用——使用自定义 layouts/index.html
+  # profileMode 已禁用——使用自定义 layouts/index.html
+
+  # 静态资源：favicon 真实文件（修复 5 个 404：favicon.ico、favicon-16x16.png、favicon-32x32.png、apple-touch-icon.png、safari-pinned-tab.svg）
+  [params.assets]
+    favicon = "favicon.svg"
+    favicon16x16 = "favicon.png"
+    favicon32x32 = "favicon.png"
+    apple_touch_icon = "favicon.png"
+    safari_pinned_tab = "favicon.svg"
 
   [params.search]
     enable = true
@@ -55,7 +66,7 @@ timeZone = "Asia/Shanghai"
 
   # ShowShareButtons 已修正为 ShareButtons = []，关闭所有社交分享图标
 
-# 导航菜单（五大内容支柱）
+# 导航菜单
 [menu]
   [[menu.main]]
     name = "首页"
@@ -66,29 +77,33 @@ timeZone = "Asia/Shanghai"
     url = "/models/"
     weight = 2
   [[menu.main]]
-    name = "🌌 星图"
-    url = "/graph/"
-    weight = 3
-  [[menu.main]]
     name = "🤖 AI 学习"
     url = "/ai-learning/"
-    weight = 4
+    weight = 3
   [[menu.main]]
     name = "🎯 决策洞察"
     url = "/insights/"
-    weight = 5
+    weight = 4
   [[menu.main]]
     name = "🧠 元认知"
     url = "/metacognition/"
+    weight = 5
+  [[menu.main]]
+    name = "📚 学习之道"
+    url = "/learning/"
     weight = 6
+  [[menu.main]]
+    name = "✍️ 人类专栏"
+    url = "/human/"
+    weight = 7
   [[menu.main]]
     name = "🔍 搜索"
     url = "/search/"
-    weight = 7
+    weight = 8
   [[menu.main]]
     name = "关于"
     url = "/about/"
-    weight = 8
+    weight = 9
 
 # Markdown 配置
 [markup]

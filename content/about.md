@@ -113,7 +113,7 @@ aliases: ["/contact/"]
   var el = document.getElementById('token-usage');
   if (!el) return;
 
-  fetch('https://ybq-me-ai.garyyuen.workers.dev/api/usage')
+  fetch('/api/ai/api/usage')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var today = data.today || { total: 0, hours: {} };
@@ -211,7 +211,7 @@ aliases: ["/contact/"]
   var el = document.getElementById('evolution');
   if (!el) return;
 
-  fetch('https://ybq-me-ai.garyyuen.workers.dev/api/evolution')
+  fetch('/api/ai/api/evolution')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var stats = data.stats || { total: 0, actions: {}, quality: { positive: 0, negative: 0 } };

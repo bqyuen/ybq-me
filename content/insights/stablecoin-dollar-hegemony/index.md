@@ -8,7 +8,7 @@ categories: ["宏观金融"]
 aliases: ["/insights/stablecoin-dollar-hegemony/"]
 
 cover:
-    image: "cover.jpg"
+    image: "cover.png"
     alt: "稳定币如何把全球散户的零钱变成美债接盘侠 · 信息图"
     caption: "稳定 ≠ 安全 · 美元霸权的最后一个补丁"
     relative: true

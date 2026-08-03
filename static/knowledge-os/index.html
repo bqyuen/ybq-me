@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识操作系统 · 认知科学版</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   Design System
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --text: #2c2c2c;
+  --text-secondary: #555;
+  --muted: #6b6b6b;
+  --border: #e8e4de;
+  --border-light: #f0ece6;
+
+  --primary: #c45c3e;
+  --primary-rgb: 196,92,62;
+  --primary-light: #f5e6e0;
+  --primary-dark: #a04830;
+
+  --green: #2d6a4f;
+  --green-light: #d8f3dc;
+  --blue: #1b4965;
+  --blue-light: #caf0f8;
+  --purple: #6a4c93;
+  --purple-light: #e8dcf5;
+  --red: #bc4749;
+  --red-light: #ffccd5;
+  --orange: #b8860b;
+  --orange-light: #fff8e1;
+  --teal: #52796f;
+  --teal-light: #d8e2dc;
+  --brown: #8b6914;
+  --brown-light: #f5ecd0;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.04);
+  --shadow: 0 1px 8px rgba(0,0,0,.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,.08);
+  --transition: .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 68px; }
+
+body {
+  font-family: "PingFang SC","Noto Sans SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,sans-serif;
+  background: var(--bg); color: var(--text);
+  line-height: 1.9; font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection { background: var(--primary-light); color: var(--primary); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d8d3ca; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+.container { max-width: 880px; margin: 0 auto; padding: 0 28px 80px; }
+
+/* ── Progress bar ── */
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--primary); width: 0; z-index: 200; transition: width .1s linear; }
+
+/* ── Back to top ── */
+.top-btn { position: fixed; right: 24px; bottom: 24px; width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 1.1rem; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.2); opacity: 0; pointer-events: none; transition: .25s; z-index: 150; }
+.top-btn.show { opacity: 1; pointer-events: auto; }
+
+/* ═══════════════════════════════════════════════════════════
+   Navigation
+   ═══════════════════════════════════════════════════════════ */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,249,246,.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  padding: 0;
+}
+.nav-inner {
+  max-width: 880px; margin: 0 auto; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 52px; gap: 16px;
+}
+.nav-brand {
+  font-weight: 700; font-size: .92rem; color: var(--primary);
+  letter-spacing: .5px; white-space: nowrap;
+}
+.nav-links { display: flex; gap: 2px; flex-wrap: wrap; }
+.nav-links a {
+  font-size: .76rem; color: var(--muted); text-decoration: none;
+  padding: 6px 10px; border-radius: 6px;
+  transition: var(--transition); white-space: nowrap;
+  font-weight: 500;
+}
+.nav-links a:hover { background: var(--primary-light); color: var(--primary); }
+.nav-links a.active { background: var(--primary); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════════
+   Hero
+   ═══════════════════════════════════════════════════════════ */
+.hero {
+  text-align: center; padding: 64px 20px 52px;
+  margin-bottom: 48px;
+  position: relative;
+}
+.hero::after {
+  content: ""; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  border-radius: 2px;
+}
+.hero h1 {
+  font-size: 2.6rem; font-weight: 800; letter-spacing: 2px;
+  line-height: 1.25; margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .subtitle {
+  color: var(--muted); font-size: 1.08rem; max-width: 600px;
+  margin: 0 auto 24px; line-height: 1.7;
+}
+.hero .badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hero .badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--primary-light); color: var(--primary);
+  font-size: .78rem; padding: 5px 14px; border-radius: 20px;
+  font-weight: 600; letter-spacing: .3px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOC
+   ═══════════════════════════════════════════════════════════ */
+.toc {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 30px 34px; margin-bottom: 48px;
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+}
+.toc h2 {
+  font-size: 1.1rem; margin-bottom: 20px; color: var(--primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.toc-grid {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 6px 24px;
+}
+.toc-item {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 7px 0; border-bottom: 1px dashed var(--border-light);
+  font-size: .9rem;
+}
+.toc-item:last-child { border-bottom: none; }
+.toc-num {
+  font-weight: 800; color: var(--primary); font-size: .82rem;
+  min-width: 24px; text-align: center;
+}
+.toc-item a { color: var(--text); text-decoration: none; transition: var(--transition); }
+.toc-item a:hover { color: var(--primary); }
+
+/* ═══════════════════════════════════════════════════════════
+   Sections
+   ═══════════════════════════════════════════════════════════ */
+.section { margin-bottom: 64px; }
+.section-head {
+  font-size: 1.4rem; font-weight: 700; padding: 16px 22px;
+  border-radius: var(--radius); color: #fff; margin-bottom: 30px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow-md);
+  position: relative; overflow: hidden;
+}
+.section-head::before {
+  content: ""; position: absolute; top: -50%; right: -10%;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,.08); border-radius: 50%;
+}
+.section-head .sn {
+  background: rgba(255,255,255,.22); width: 40px; height: 40px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: .95rem; font-weight: 800; flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+.section-intro {
+  color: var(--muted); font-size: .95rem;
+  margin: -18px 0 28px 2px; line-height: 1.7;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Cards
+   ═══════════════════════════════════════════════════════════ */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 28px 32px; margin-bottom: 20px;
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.card h3 {
+  font-size: 1.12rem; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  color: var(--text);
+}
+.card h4 { font-size: 1rem; margin: 20px 0 10px; color: var(--text); }
+.card p { margin-bottom: 12px; text-align: justify; }
+.card p:last-child { margin-bottom: 0; }
+.card ul, .card ol { margin: 10px 0 12px 24px; }
+.card li { margin-bottom: 8px; }
+.card strong { color: var(--primary); }
+.card .muted { color: var(--muted); font-size: .9rem; }
+
+/* ── Accent card (colored left border) ── */
+.card-accent {
+  border-left: 4px solid var(--primary);
+  padding-left: 28px;
+}
+
+/* ── Principle card ── */
+.principle {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 0; margin-bottom: 20px;
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+  overflow: hidden; transition: var(--transition);
+}
+.principle:hover { box-shadow: var(--shadow-md); }
+.principle-head {
+  padding: 20px 28px; display: flex; align-items: center; gap: 14px;
+  border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+}
+.principle-num {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.principle-title { font-size: 1.08rem; font-weight: 700; }
+.principle-body { padding: 24px 28px; }
+.principle-body p { margin-bottom: 12px; text-align: justify; }
+.principle-body p:last-child { margin-bottom: 0; }
+
+/* ── Mechanism card ── */
+.mech {
+  background: var(--surface); border-radius: var(--radius);
+  margin-bottom: 20px; box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+  overflow: hidden; transition: var(--transition);
+}
+.mech:hover { box-shadow: var(--shadow-md); }
+.mech-head {
+  padding: 22px 28px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-light);
+}
+.mech-head h4 { font-size: 1.08rem; margin: 0; }
+.mech-body { padding: 24px 28px; }
+.mech-body p { margin-bottom: 12px; text-align: justify; }
+.mech-body ol { margin: 10px 0 12px 24px; }
+.mech-body li { margin-bottom: 8px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Info Boxes
+   ═══════════════════════════════════════════════════════════ */
+.box {
+  border-radius: var(--radius-sm); padding: 16px 20px;
+  margin: 16px 0; border-left: 4px solid;
+  font-size: .93rem;
+}
+.box.primary  { background: var(--primary-light); border-color: var(--primary); }
+.box.success  { background: var(--green-light);  border-color: var(--green); }
+.box.info     { background: var(--blue-light);   border-color: var(--blue); }
+.box.warn     { background: var(--orange-light); border-color: var(--orange); }
+.box.danger   { background: var(--red-light);    border-color: var(--red); }
+.box.purple   { background: var(--purple-light); border-color: var(--purple); }
+.box.teal     { background: var(--teal-light);   border-color: var(--teal); }
+.box.brown    { background: var(--brown-light);  border-color: var(--brown); }
+.box strong   { display: block; margin-bottom: 6px; font-size: .95rem; }
+.box ul       { margin: 8px 0 0 20px; }
+.box li       { margin-bottom: 5px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Step List
+   ═══════════════════════════════════════════════════════════ */
+.steps { counter-reset: s; list-style: none; margin: 14px 0!important; padding-left: 0!important; }
+.steps li {
+  counter-increment: s; padding: 12px 14px 12px 50px; margin-bottom: 8px!important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #fafbfc 100%);
+  border-radius: var(--radius-sm); position: relative;
+  border: 1px solid var(--border-light);
+}
+.steps li::before {
+  content: counter(s); position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; background: var(--primary);
+  color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 800;
+  box-shadow: 0 2px 6px rgba(var(--primary-rgb),.3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Tables
+   ═══════════════════════════════════════════════════════════ */
+table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  font-size: .9rem; margin: 16px 0;
+  border-radius: var(--radius-sm); overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+th, td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+th {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #fceee9 100%);
+  color: var(--primary); font-weight: 700; font-size: .85rem;
+  letter-spacing: .3px; text-transform: none;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(var(--primary-rgb),.02); }
+td:first-child { font-weight: 600; }
+
+/* ═══════════════════════════════════════════════════════════
+   Tags
+   ═══════════════════════════════════════════════════════════ */
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: 4px;
+  font-size: .73rem; font-weight: 700; margin-left: 6px;
+  letter-spacing: .2px;
+}
+.tag-s    { background: var(--primary-light); color: var(--primary); }
+.tag-a    { background: var(--purple-light); color: var(--purple); }
+.tag-b    { background: var(--blue-light);   color: var(--blue); }
+.tag-easy { background: var(--green-light);  color: var(--green); }
+.tag-med  { background: var(--orange-light); color: var(--orange); }
+.tag-hard { background: var(--red-light);    color: var(--red); }
+.tag-time { background: #eee; color: #666; font-weight: 500; }
+
+/* ═══════════════════════════════════════════════════════════
+   Channel Grid
+   ═══════════════════════════════════════════════════════════ */
+.ch-grid {
+  display: grid; grid-template-columns: repeat(auto-fill,minmax(265px,1fr));
+  gap: 14px; margin-top: 16px;
+}
+.ch {
+  background: var(--surface); border-radius: var(--radius-sm);
+  padding: 16px 18px; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--primary);
+  transition: var(--transition);
+}
+.ch:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.ch h5 {
+  font-size: .9rem; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.ch p { font-size: .84rem; color: var(--muted); line-height: 1.6; margin: 0; }
+
+/* ── Channel search tools ── */
+.ch-tools { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; align-items: center; }
+.ch-tools input { flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: .9rem; background: var(--surface); font-family: inherit; }
+.ch-tools input:focus { outline: 2px solid var(--primary-light); border-color: var(--primary); }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 20px; padding: 4px 13px; font-size: .78rem; cursor: pointer; color: var(--muted); font-family: inherit; transition: var(--transition); }
+.chip:hover { border-color: var(--primary); color: var(--primary); }
+.chip.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.ch-count { font-size: .82rem; color: var(--muted); margin: 6px 0 14px; }
+
+/* ── Copy button ── */
+.copybtn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); font-size: .78rem; color: var(--muted); cursor: pointer; font-family: inherit; transition: var(--transition); margin-top: 8px; }
+.copybtn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ═══════════════════════════════════════════════════════════
+   Quote
+   ═══════════════════════════════════════════════════════════ */
+.quote {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #fceee9 100%);
+  border-left: 4px solid var(--primary);
+  padding: 20px 26px; margin: 24px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic; font-size: 1.02rem; line-height: 1.8;
+}
+.quote strong { font-style: normal; color: var(--primary); }
+
+/* ═══════════════════════════════════════════════════════════
+   Details (Collapsible)
+   ═══════════════════════════════════════════════════════════ */
+details {
+  background: var(--surface); border-radius: var(--radius-sm);
+  margin-bottom: 10px; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light); overflow: hidden;
+  transition: var(--transition);
+}
+details:hover { box-shadow: var(--shadow); }
+details[open] { box-shadow: var(--shadow); }
+details summary {
+  padding: 14px 20px; cursor: pointer; font-weight: 600;
+  list-style: none; display: flex; align-items: center; gap: 10px;
+  font-size: .95rem; transition: var(--transition);
+  user-select: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before {
+  content: ""; display: inline-block;
+  width: 0; height: 0;
+  border-left: 6px solid var(--primary);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform .2s;
+}
+details[open] summary::before { transform: rotate(90deg); }
+details .inner { padding: 0 20px 20px 36px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Workflow Cards
+   ═══════════════════════════════════════════════════════════ */
+.wf {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 28px 32px; margin-bottom: 20px;
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+}
+.wf-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.wf-head .icon { font-size: 1.6rem; }
+.wf-head h4 { margin: 0; font-size: 1.05rem; }
+.wf-head .target { color: var(--muted); font-size: .88rem; width: 100%; margin-top: 2px; }
+.wf-block {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--border-light);
+}
+.wf-block:last-of-type { border-bottom: none; }
+.wf-label {
+  background: var(--primary-light); color: var(--primary);
+  padding: 4px 14px; border-radius: 6px;
+  font-weight: 700; font-size: .82rem; white-space: nowrap;
+  flex-shrink: 0;
+}
+.wf-block ul { margin: 0 0 0 4px; padding-left: 18px; }
+.wf-block li { margin-bottom: 6px; font-size: .92rem; }
+
+/* ── Workflow overview ── */
+.wf-overview {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin: 28px 0; flex-wrap: wrap;
+}
+.wf-node {
+  text-align: center; padding: 16px 20px;
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+  min-width: 140px;
+}
+.wf-node .circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px; font-size: 1.2rem; font-weight: 800; color: #fff;
+}
+.wf-node h5 { font-size: .88rem; margin-bottom: 4px; }
+.wf-node p { font-size: .78rem; color: var(--muted); margin: 0; }
+.wf-node .time { font-size: .72rem; color: var(--primary); font-weight: 600; margin-top: 4px; display: block; }
+.wf-arrow { font-size: 1.4rem; color: var(--muted); padding: 0 8px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Troubleshooting Grid
+   ═══════════════════════════════════════════════════════════ */
+.ts-grid {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap: 16px; margin-top: 16px;
+}
+.ts {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 22px 24px; box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid var(--red);
+  transition: var(--transition);
+}
+.ts:hover { box-shadow: var(--shadow-md); }
+.ts .symptom { font-weight: 700; font-size: .95rem; margin-bottom: 10px; color: var(--red); }
+.ts .cause { font-size: .88rem; color: var(--text-secondary); margin-bottom: 10px; }
+.ts .cause strong { color: var(--text); display: block; margin-bottom: 2px; }
+.ts .fix { font-size: .88rem; }
+.ts .fix strong { color: var(--green); display: block; margin-bottom: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Checklist (Interactive)
+   ═══════════════════════════════════════════════════════════ */
+.checklist { margin: 16px 0; }
+.cl-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border-light);
+}
+.cl-item:last-child { border-bottom: none; }
+.cl-box {
+  width: 24px; height: 24px; border: 2px solid var(--border);
+  border-radius: 6px; flex-shrink: 0; margin-top: 2px;
+  cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface);
+}
+.cl-box.checked {
+  background: var(--green); border-color: var(--green);
+}
+.cl-box.checked::after {
+  content: "\2713"; color: #fff; font-size: 14px; font-weight: 700;
+}
+.cl-item.checked .cl-text { opacity: .6; text-decoration: line-through; }
+.cl-text { flex: 1; font-size: .92rem; }
+.cl-text strong { color: var(--primary); }
+.cl-score {
+  font-size: .8rem; color: var(--muted); font-weight: 600;
+  white-space: nowrap; margin-top: 2px;
+}
+
+/* ── Score display ── */
+.score-display {
+  text-align: center; padding: 20px; margin-top: 16px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #fceee9 100%);
+  border-radius: var(--radius);
+}
+.score-display .big {
+  font-size: 2.4rem; font-weight: 800; color: var(--primary);
+  line-height: 1;
+}
+.score-display .label { font-size: .88rem; color: var(--muted); margin-top: 4px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Scenario Grid
+   ═══════════════════════════════════════════════════════════ */
+.sc-grid {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  gap: 16px; margin-top: 16px;
+}
+.sc {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 22px 24px; box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+  border-top: 4px solid var(--primary);
+  transition: var(--transition);
+}
+.sc:hover { box-shadow: var(--shadow-md); }
+.sc h4 { font-size: 1rem; margin-bottom: 12px; color: var(--primary); }
+.sc ul { padding-left: 18px; font-size: .88rem; color: var(--text-secondary); }
+.sc li { margin-bottom: 6px; }
+.sc li strong { color: var(--text); }
+
+/* ═══════════════════════════════════════════════════════════
+   Reference List
+   ═══════════════════════════════════════════════════════════ */
+.ref-list { margin: 16px 0; counter-reset: ref; }
+.ref-list li {
+  margin-bottom: 12px; font-size: .88rem; line-height: 1.65;
+  padding-left: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Template Code Block
+   ═══════════════════════════════════════════════════════════ */
+pre {
+  background: linear-gradient(135deg, #f8f9fa 0%, #fafbfc 100%);
+  padding: 22px 24px; border-radius: var(--radius-sm);
+  font-size: .86rem; line-height: 1.75; overflow-x: auto;
+  font-family: "SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  border: 1px solid var(--border-light);
+  margin: 16px 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Quickstart Cards
+   ═══════════════════════════════════════════════════════════ */
+.qs {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 24px 28px; margin-bottom: 16px;
+  box-shadow: var(--shadow); border: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+.qs:hover { box-shadow: var(--shadow-md); }
+.qs h4 { font-size: 1.02rem; margin-bottom: 14px; color: var(--primary); }
+.qs ol { margin: 0 0 10px 24px; font-size: .92rem; }
+.qs li { margin-bottom: 8px; }
+.qs .note { font-size: .88rem; color: var(--muted); margin-top: 10px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Divider & Footer
+   ═══════════════════════════════════════════════════════════ */
+.divider {
+  height: 1px; margin: 48px 0;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+footer {
+  text-align: center; padding: 48px 0 28px; color: var(--muted); font-size: .85rem;
+  border-top: 1px solid var(--border-light); margin-top: 48px;
+}
+footer .ft-main { font-weight: 600; color: var(--text-secondary); }
+footer .ft-sub { margin-top: 6px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .hero h1 { font-size: 1.8rem; }
+  .section-head { font-size: 1.15rem; padding: 14px 16px; }
+  .nav-inner { justify-content: center; height: auto; padding: 8px 16px; }
+  .nav-links { justify-content: center; }
+  .ch-grid, .toc-grid, .ts-grid, .sc-grid { grid-template-columns: 1fr; }
+  .card, .mech-body, .principle-body { padding: 20px 20px; }
+  .wf-overview { flex-direction: column; }
+  .wf-arrow { transform: rotate(90deg); }
+}
+
+/* ── Print ── */
+@media print {
+  .nav { display: none; }
+  details { display: block; }
+  details summary::before { display: none; }
+  body { font-size: 11pt; }
+  .card, .principle, .mech, .wf, .ts { break-inside: avoid; }
+}
+
+/* Wiki-style internal links */
+.wiki-link {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(200, 159, 101, .4);
+  transition: border-color .2s, color .2s;
+}
+.wiki-link:hover {
+  color: #C89F65;
+  border-bottom-color: #C89F65;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Navigation
+     ═══════════════════════════════════════════════════════════ -->
+<div class="progress" id="progress"></div>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">📚 知识操作系统</div>
+    <div class="nav-links" id="navlinks">
+      <a href="#s0">导言</a>
+      <a href="#s1">认知原理</a>
+      <a href="#s2">输入渠道</a>
+      <a href="#s3">连接机制</a>
+      <a href="#s4">存储·检索</a>
+      <a href="#s5">工作流</a>
+      <a href="#s6">质量评估</a>
+      <a href="#s7">附录</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════
+     Hero
+     ═══════════════════════════════════════════════════════════ -->
+<header class="hero">
+  <h1>知识操作系统</h1>
+  <p class="subtitle">认知科学 × 实操手册 · 让碎片变成可调用的认知资产</p>
+  <div class="badges">
+    <span class="badge">🧠 8 条认知原理</span>
+    <span class="badge">🗼 <a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重知识阶梯">九重知识阶梯</a></span>
+    <span class="badge">📡 36 精选渠道</span>
+    <span class="badge">🔗 5 种连接机制</span>
+    <span class="badge">🔄 7 步闭环</span>
+    <span class="badge">⏱ 每日 15 分钟</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOC
+     ═══════════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>📋 全文导航</h2>
+  <div class="toc-grid">
+    <div class="toc-item"><span class="toc-num">0</span><a href="#s0">导言：你真正的问题不是"信息不够"</a></div>
+    <div class="toc-item"><span class="toc-num">1</span><a href="#s1">认知原理：大脑如何处理知识</a></div>
+    <div class="toc-item"><span class="toc-num">2</span><a href="#s2">输入渠道：50 种知识来源</a></div>
+    <div class="toc-item"><span class="toc-num">3</span><a href="#s3">连接机制：5 种经过验证的加工方式</a></div>
+    <div class="toc-item"><span class="toc-num">4</span><a href="#s4">存储·检索·淘汰：让知识"活"起来</a></div>
+    <div class="toc-item"><span class="toc-num">5</span><a href="#s5">工作流：日 / 周 / 月 / 季节奏</a></div>
+    <div class="toc-item"><span class="toc-num">6</span><a href="#s6">质量评估：用指标驱动改进</a></div>
+    <div class="toc-item"><span class="toc-num">A</span><a href="#s7">附录：工具、模板与参考文献</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 0  导言
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s0">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))">
+    <span class="sn">0</span> 导言：你真正的问题不是"信息不够"
+  </div>
+
+  <div class="card">
+    <h3>🎯 核心诊断</h3>
+    <p>你每天接触的信息量可能超过 100 条独立知识点——公众号、播客、视频、对话、邮件。问题不在于获取太少，而在于<strong>这些信息大部分从未被加工</strong>。</p>
+    <p>Ebbinghaus（1885） <a href="https://scholar.google.com/scholar?q=Ebbinghaus+1885+Gedächtnis+forgetting+curve" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的经典<a href="/models/070-遗忘曲线/" class="wiki-link" title="查看：遗忘曲线">遗忘曲线</a>表明，无意义材料在学习后 20 分钟遗忘 42%，1 小时遗忘 56%，1 天遗忘 66%。即使是有意义的材料，如果没有主动加工，一周后也会遗忘大半。后续研究 Wixted（2004） <a href="https://scholar.google.com/scholar?q=Wixted+2004+psychology+neuroscience+forgetting" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>用更严格的实验设计复现了这一基本规律。</p>
+    <div class="quote">
+      <strong>关键洞察：</strong>知识管理的本质不是"收集更多信息"，而是"对已有信息进行有效加工"。收集是输入端，加工是处理端——大多数人把 90% 的精力放在输入上，只留 10% 给加工。这个比例应该反过来。
+    </div>
+    <p>本手册基于认知心理学和教育科学的研究成果，提供一套<strong>可验证、可执行</strong>的知识加工系统。每一个建议都有研究依据，每一个指标都可以实际测量。</p>
+  </div>
+
+  <div class="card">
+    <h3>📖 阅读指南</h3>
+    <p><strong>第一遍</strong>：通读 §1（认知原理），理解 8 条原理 + <a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重阶梯">九重阶梯</a>模型。<a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重阶梯">九重阶梯</a>是整套系统的总纲——它告诉你"学过"和"学会"之间隔着什么。</p>
+    <p><strong>第二遍</strong>：精读 §3（连接机制），选择 1-2 种最适合你的加工方式，本周就开始实践。</p>
+    <p><strong>持续使用</strong>：§5（工作流）作为日常检查清单，§6（质量评估）每月执行一次。</p>
+    <div class="box warn"><strong>⚠️ 本手册的价值在于被使用，不在于被读完。</strong>每读完一节，请立即执行该节末尾的"即时行动"。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 1  认知原理
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s1">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--green),var(--teal))">
+    <span class="sn">1</span> 认知原理：大脑如何处理知识
+  </div>
+  <p class="section-intro">理解大脑的记忆机制，是一切学习策略的根基。以下 8 条认知原理 + 1 套<a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重阶梯">九重阶梯</a>模型，构成整套系统的理论根基。</p>
+
+  <!-- 1.1 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--green),var(--teal))">1</div>
+      <div class="principle-title">编码特异性原则</div>
+    </div>
+    <div class="principle-body">
+      <p>记忆不是独立存储的，而是与编码时的情境（地点、情绪、身体状态）绑定在一起。在与编码时相似的情境下，记忆最容易被提取。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Tulving & Thomson（1973） <a href="https://scholar.google.com/scholar?q=Tulving+Thomson+1973+encoding+specificity" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的编码特异性实验表明，当提取情境与编码情境匹配时，回忆成绩显著优于不匹配情境。Godden & Baddeley（1975） <a href="https://scholar.google.com/scholar?q=Godden+Baddeley+1975+context+dependent+memory" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>在水下/陆地学习实验中复现了这一效应：在水下学习的词在水下回忆更好，在陆地学习的词在陆地回忆更好。</div>
+      <p><strong>实践启示</strong>：多情境学习（在不同地点、不同时间、不同情绪状态下学习同一概念）比单一情境学习更有利于知识的迁移应用。不要总在同一张桌子前学习——偶尔换个环境，换个时间，甚至换个心情。</p>
+    </div>
+  </div>
+
+  <!-- 1.2 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--primary),#e76f51)">2</div>
+      <div class="principle-title">提取练习效应</div>
+    </div>
+    <div class="principle-body">
+      <p>主动从记忆中提取知识，比重复阅读更能强化记忆。每次成功提取都会加强该记忆的神经通路——这是认知心理学中最稳健的发现之一。</p>
+      <div class="box info"><strong>🔬 关键实验</strong>Roediger & Karpicke（2006） <a href="https://scholar.google.com/scholar?q=Roediger+Karpicke+2006+test+enhanced+learning" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>让学生阅读一篇文章，一组在学习后立即测试（提取练习），另一组重复阅读。一周后测验：提取练习组保留约 80%，重复阅读组仅保留约 33%。<strong>提取比重读有效 2.4 倍。</strong>Rowland（2014） <a href="https://scholar.google.com/scholar?q=Rowland+2014+testing+effect+meta+analysis" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的元分析（159 项研究）确认该效应在不同年龄段、不同材料类型中均稳健存在。</div>
+      <p><strong>实践启示</strong>：学完一个概念后，合上书用自己的话复述，比反复阅读有效得多。不要只是"看懂了"，要测试自己能不能"说出来"。</p>
+    </div>
+  </div>
+
+  <!-- 1.3 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--blue),#2d6a4f)">3</div>
+      <div class="principle-title">间隔效应</div>
+    </div>
+    <div class="principle-body">
+      <p>分散在多个时间段学习，比集中在一个时间段学习更有效。每次"快要遗忘时重新学习"会让记忆更持久。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Cepeda 等人（2006） <a href="https://scholar.google.com/scholar?q=Cepeda+2006+distributed+practice+verbal+recall" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的元分析（254 项研究）确认：在保持总学习时间不变的情况下，间隔学习的长期保持效果显著优于集中学习。最优间隔取决于目标保持时间——大致遵循"保持时间的 10-20%"规则。例如，如果你希望一个月后还记得，间隔 3-6 天复习一次最优。</div>
+      <p><strong>实践启示</strong>：学完一个概念后，第 1 天复习一次，第 3 天再复习，第 7 天再复习，第 30 天再复习。每次只需 2-3 分钟的主动回忆。</p>
+    </div>
+  </div>
+
+  <!-- 1.4 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--purple),#9c6644)">4</div>
+      <div class="principle-title">精细化编码</div>
+    </div>
+    <div class="principle-body">
+      <p>将新信息与已有知识建立联系，信息会编码得更深。浅层编码（只看表面特征）和深层编码（理解含义和关联）产生的记忆持久性差异巨大。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Craik & Lockhart（1972） <a href="https://scholar.google.com/scholar?q=Craik+Lockhart+1972+levels+of+processing" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>提出的加工水平理论（Levels of Processing）：要求被试对单词进行语义加工（如判断"这个词描述的东西对你有用吗？"）的回忆成绩，是仅仅判断字体大小的 2-3 倍。Craik & Tulving（1975） <a href="https://scholar.google.com/scholar?q=Craik+Tulving+1975+depth+of+processing" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>进一步证明，加工越精细（如造一个句子而非仅判断是否认识），记忆效果越好。</div>
+      <p><strong>实践启示</strong>：学习时不要只划线，要问自己："这和我已经知道的什么有关？""这能用来解决什么问题？""这在什么情境下会用到？"</p>
+    </div>
+  </div>
+
+  <!-- 1.5 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--orange),#b8860b)">5</div>
+      <div class="principle-title">生成效应</div>
+    </div>
+    <div class="principle-body">
+      <p>自己主动生成的信息，比被动接收的信息记得更牢。哪怕生成的内容不够完美，"自己想出来"这个过程本身就强化了记忆。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Slamecka & Graf（1978） <a href="https://scholar.google.com/scholar?q=Slamecka+Graf+1978+generation+effect" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>首次系统证明生成效应：被试自己补全句子中的关键词，回忆成绩显著优于直接阅读完整句子。Bertsch 等人（2007） <a href="https://scholar.google.com/scholar?q=Bertsch+2007+generation+effect+meta+analysis" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>在不同年龄段复现了该效应，表明其具有跨年龄的稳健性。</div>
+      <p><strong>实践启示</strong>：读完一段内容后，尝试用自己的话写一个总结，而不是复制原文。即使你的总结不完美，这个"生成"过程也在强化你的理解。</p>
+    </div>
+  </div>
+
+  <!-- 1.6 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--red),#bc4749)">6</div>
+      <div class="principle-title">情绪与记忆</div>
+    </div>
+    <div class="principle-body">
+      <p>情绪唤醒的事件被编码得更强烈。杏仁核的激活会增强海马体的记忆巩固效率，使情绪事件比中性事件更容易被长期记住。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>McGaugh（2004） <a href="https://scholar.google.com/scholar?q=McGaugh+2004+amygdala+consolidation+memories" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>综述了情绪对记忆巩固的调节机制：去甲肾上腺素和皮质醇通过杏仁核调节海马体的突触可塑性。注意：情绪增强的是记忆的<strong>核心特征</strong>，而非所有细节——"闪光灯记忆"（Brown & Kulik, 1977 <a href="https://scholar.google.com/scholar?q=Brown+Kulik+1977+flashbulb+memories" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）的细节准确性常被高估（Talarico & Rubin, 2003 <a href="https://scholar.google.com/scholar?q=Talarico+Rubin+2003+flashbulb+memories+confidence" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）。</div>
+      <p><strong>实践启示</strong>：将学习内容与个人重要目标联系起来，或在学习后立即应用到真实场景中（成功或失败都会产生情绪唤醒）。</p>
+    </div>
+  </div>
+
+  <!-- 1.7 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,#1b4965,var(--blue))">7</div>
+      <div class="principle-title">睡眠与记忆巩固</div>
+    </div>
+    <div class="principle-body">
+      <p>睡眠不是大脑"关机"，而是记忆巩固的关键时期。睡眠期间，大脑会重放白天的经历，将短期记忆转化为长期记忆，并建立新的神经连接。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Walker & Stickgold（2006） <a href="https://scholar.google.com/scholar?q=Walker+Stickgold+2006+sleep+memory+plasticity" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>综述表明，慢波睡眠（SWS）对陈述性记忆（事实和事件）巩固尤为重要，REM 睡眠对程序性记忆（技能和习惯）巩固更重要。Diekelmann & Born（2010） <a href="https://scholar.google.com/scholar?q=Diekelmann+Born+2010+memory+function+sleep" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>进一步综述了睡眠在记忆整合和优化中的作用。</div>
+      <p><strong>实践启示</strong>：重要概念安排在睡前学习，然后保证充足睡眠（7-8 小时）。不要熬夜学习——牺牲睡眠的学习是低效的。</p>
+    </div>
+  </div>
+
+  <!-- 1.8 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--teal),var(--green))">8</div>
+      <div class="principle-title">交错练习</div>
+    </div>
+    <div class="principle-body">
+      <p>混合学习不同主题或不同类型的问题，比逐个主题集中学习更有效。交错迫使大脑不断区分、选择和检索，增强了辨别能力和迁移能力。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Rohrer & Taylor（2007） <a href="https://scholar.google.com/scholar?q=Rohrer+Taylor+2007+shuffling+mathematics+problems" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>让两组学生学习数学问题：一组按类型集中练习，另一组交错练习。最终测试时，交错组的成绩是集中组的 2 倍。Kornell & Bjork（2008） <a href="https://scholar.google.com/scholar?q=Kornell+Bjork+2008+learning+concepts+categories" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>在艺术风格学习中也发现了类似效应。</div>
+      <p><strong>实践启示</strong>：不要一周只学一个主题。在同一天或同一周内混合学习 2-3 个相关主题，让大脑在不同知识之间建立连接。</p>
+    </div>
+  </div>
+
+  <!-- 1.9 九重知识体系 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--primary),var(--purple))">9</div>
+      <div class="principle-title">九重知识体系：从"翻书"到"内化"的质变阶梯</div>
+    </div>
+    <div class="principle-body">
+      <p>前面 8 条原理回答了"大脑如何处理知识"。但还有一个更根本的问题：<strong>"学过"和"学会"之间到底隔着什么？</strong>同样读一本书，有人能用知识改变决策与行为，有人只是"看完就忘"——区别在于知识到达了哪一层。</p>
+      <div class="quote"><strong>核心洞察：</strong>知识的九层不是程度深浅，而是<strong>质变阶梯</strong>——每一层都是不同性质的认知事件。大多数人卡在第 3-4 层就以为自己"学会"了，真正的学会要穿透到第 9 层：改变行为。</div>
+      <table>
+        <tr><th>层级</th><th>动作</th><th>关键词</th><th>一句话定义</th></tr>
+        <tr style="background:var(--blue-light)"><td><strong>1</strong></td><td>接触</td><td>翻过书</td><td>知识进入视野，但尚未停留</td></tr>
+        <tr style="background:var(--blue-light)"><td><strong>2</strong></td><td>浏览</td><td>看过内容</td><td>注意力落上去，信息被扫过一遍</td></tr>
+        <tr style="background:var(--blue-light)"><td><strong>3</strong></td><td>记忆</td><td>复述重点</td><td>信息被存入，能原样提取</td></tr>
+        <tr style="background:var(--primary-light)"><td><strong>4</strong></td><td>理解</td><td>用自己的话讲</td><td>知识被"翻译"进自己的语言系统</td></tr>
+        <tr style="background:var(--primary-light)"><td><strong>5</strong></td><td>搭建体系</td><td>串联起来</td><td>孤立知识点长出结构，形成网络</td></tr>
+        <tr style="background:var(--primary-light)"><td><strong>6</strong></td><td>应用</td><td>跨情境调用</td><td>知识从"知道"变成"会用"</td></tr>
+        <tr style="background:var(--purple-light)"><td><strong>7</strong></td><td>思辨</td><td>发现异同</td><td>能比较、能质疑、能看见边界</td></tr>
+        <tr style="background:var(--purple-light)"><td><strong>8</strong></td><td>创新</td><td>跨域整合</td><td>整合多学科，产生前所未有的认知</td></tr>
+        <tr style="background:var(--purple-light)"><td><strong>9</strong></td><td>内化</td><td>改变行为</td><td>知识融进行动，成为"你是谁"的一部分</td></tr>
+      </table>
+      <p><strong>三大段</strong>：</p>
+      <ul>
+        <li><strong>入门段（1-3）</strong>：信息到达感官并被编码——属于"接收"层</li>
+        <li><strong>转化段（4-6）</strong>：知识从外部文本转化为个人能力——属于"加工"层</li>
+        <li><strong>穿透段（7-9）</strong>：知识从认知层穿透到行为层——属于"产出"层</li>
+      </ul>
+      <div class="box info"><strong>🔬 框架对照</strong>九层模型 ⊃ 布鲁姆六阶（布鲁姆未涵盖"接触/浏览"和"内化"）；九层 ⊃ DIKW（DIKW 把"知识→智慧"细化为四个台阶）；九层 ⊃ 费曼（费曼的核心判据 = 九层第 4 层"理解"）。<strong>三套经典框架的共同盲区</strong>：都没有明确给出第 9 层（内化到行为）的判据——这是九层模型的核心增量。对照依据：Anderson & Krathwohl（2001） <a href="https://scholar.google.com/scholar?q=Anderson+Krathwohl+2001+taxonomy+learning+teaching" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>、Rowley（2007） <a href="https://scholar.google.com/scholar?q=Rowley+2007+wisdom+hierarchy+DIKW" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>、Feynman 教学思想。</div>
+      <div class="box warn"><strong>⚠️ 关键区分</strong>：<strong>第 9 层（内化）是整个模型的真正落点</strong>。前面八层都发生在脑子里，只有第 9 层穿透到行为——它是唯一"反脆弱"的层。你"知道"沉没成本谬误（第 3-4 层），和你"在烂片看到第 5 集时真的关掉了电视"（第 9 层），是完全不同的认知事件。</div>
+
+      <!-- SVG: Nine-layer staircase -->
+      <svg viewBox="0 0 900 430" role="img" aria-label="知识九重境界阶梯图：从接触到内化" style="width:100%;margin:20px 0;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border-light)">
+        <g font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+          <rect x="20" y="344" width="92" height="36" rx="4" fill="#7d8590"/><text x="66" y="360" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">1 接触</text><text x="66" y="375" text-anchor="middle" fill="#e8e8e8" font-size="10.5">翻过书</text>
+          <rect x="116" y="308" width="92" height="72" rx="4" fill="#7d8590"/><text x="162" y="324" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">2 浏览</text><text x="162" y="339" text-anchor="middle" fill="#e8e8e8" font-size="10.5">看过内容</text>
+          <rect x="212" y="272" width="92" height="108" rx="4" fill="#7d8590"/><text x="258" y="288" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">3 记忆</text><text x="258" y="303" text-anchor="middle" fill="#e8e8e8" font-size="10.5">复述重点</text>
+          <rect x="308" y="236" width="92" height="144" rx="4" fill="#1b4965"/><text x="354" y="252" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">4 理解</text><text x="354" y="267" text-anchor="middle" fill="#cfe0ee" font-size="10.5">用自己的话讲</text>
+          <rect x="404" y="200" width="92" height="180" rx="4" fill="#1b4965"/><text x="450" y="216" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">5 体系</text><text x="450" y="231" text-anchor="middle" fill="#cfe0ee" font-size="10.5">串联成网络</text>
+          <rect x="500" y="164" width="92" height="216" rx="4" fill="#1b4965"/><text x="546" y="180" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">6 应用</text><text x="546" y="195" text-anchor="middle" fill="#cfe0ee" font-size="10.5">跨问题调用</text>
+          <rect x="596" y="128" width="92" height="252" rx="4" fill="#b3541e"/><text x="642" y="144" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">7 思辨</text><text x="642" y="159" text-anchor="middle" fill="#ffd9c2" font-size="10.5">发现异同边界</text>
+          <rect x="692" y="92" width="92" height="288" rx="4" fill="#b3541e"/><text x="738" y="108" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">8 创新</text><text x="738" y="123" text-anchor="middle" fill="#ffd9c2" font-size="10.5">跨域新认知</text>
+          <rect x="788" y="56" width="92" height="324" rx="4" fill="#7b2d43"/><text x="834" y="72" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">9 内化</text><text x="834" y="87" text-anchor="middle" fill="#f2d0d8" font-size="10.5">改变行为</text>
+          <g fill="#6f6a5e" font-size="11">
+            <text x="354" y="228" text-anchor="middle">↑ 教学输出</text>
+            <text x="450" y="192" text-anchor="middle">↑ 连接/思维导图</text>
+            <text x="546" y="156" text-anchor="middle">↑ 问题解决</text>
+            <text x="642" y="120" text-anchor="middle">↑ 失败复盘·思辨</text>
+            <text x="738" y="84" text-anchor="middle">↑ 跨域类比</text>
+            <text x="834" y="48" text-anchor="middle" font-weight="700" fill="#7b2d43">↑ 30天行为实验</text>
+          </g>
+          <line x1="20" y1="382" x2="880" y2="382" stroke="#b8b0a0" stroke-width="1.5"/>
+          <path d="M30 400 L30 392 L390 392 L390 400" fill="none" stroke="#bc4749" stroke-width="1.5"/>
+          <text x="210" y="418" text-anchor="middle" fill="#bc4749" font-size="12.5" font-weight="700">99%的"学过"停留在2-3层 · 大多数人卡在3→4</text>
+          <text x="640" y="418" text-anchor="middle" fill="#6f6a5e" font-size="12">入门段(1-3)接收 → 转化段(4-6)加工 → 穿透段(7-9)产出</text>
+        </g>
+      </svg>
+      <p><strong>九层 × 连接机制映射</strong>：</p>
+      <table>
+        <tr><th>层级跃迁</th><th>最有效的连接机制</th><th>具体做法</th></tr>
+        <tr><td>1-3 → 4（理解）</td><td>教学输出 + 提取练习</td><td>合上书复述，用大白话讲给别人听</td></tr>
+        <tr><td>4 → 5（体系）</td><td>精细化编码 + 交错练习</td><td>问"这和已知的什么有关？"，混合多主题</td></tr>
+        <tr><td>5 → 6（应用）</td><td>问题解决</td><td>找真实问题，用新知识解决</td></tr>
+        <tr><td>6 → 7（思辨）</td><td>社交讨论 + 精细化编码</td><td>和不同观点的人讨论，发现知识的边界</td></tr>
+        <tr><td>7 → 8（创新）</td><td>精细化编码（跨域类比）</td><td>把 A 领域的结构迁移到 B 领域</td></tr>
+        <tr><td>8 → 9（内化）</td><td>问题解决 + 反馈回路</td><td>反复在真实场景中应用，直到成为本能</td></tr>
+      </table>
+      <div class="box info"><strong>🔬 <a href="/models/067-元认知/" class="wiki-link" title="查看：元认知">元认知</a>：知道自己在哪里</strong>九层阶梯的核心支撑能力是<strong><a href="/models/067-元认知/" class="wiki-link" title="查看：元认知">元认知</a></strong>（Metacognition）——即"知道自己知道什么、不知道什么"的能力（Flavell, 1979 <a href="https://scholar.google.com/scholar?q=Flavell+1979+metacognition+cognitive+monitoring" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）。没有<a href="/models/067-元认知/" class="wiki-link" title="查看：元认知">元认知</a>，你无法准确判断自己处于哪一层，也无法选择正确的下一步。<a href="/models/067-元认知/" class="wiki-link" title="查看：元认知">元认知</a>能力本身可以通过练习提升：每次学习后问自己"我对这个概念的理解有多深？"，然后用九层阶梯校准。</div>
+      <div class="box success"><strong>💡 自我诊断</strong>：选一个你最近学的概念，问自己："我到达了第几层？"如果你只能复述定义（第 3 层），说明还需要教学输出来推进到第 4 层。如果你能解释但从未用过（第 4 层），说明需要找一个真实问题来推进到第 6 层。大多数人卡在 3-4 层——这不是失败，是正常的；关键是知道自己在哪里，以及下一步该做什么。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="box primary"><strong>💡 即时行动</strong>从以上 8+1 条原理中，选择<strong>你目前最违反的 2 条</strong>。例如：如果你从不测试自己（违反提取练习），就从今天开始，学完任何内容后合上书复述一遍。如果你总是卡在"知道但不会用"（九层的第 4 层），就找一个真实问题来推进到第 6 层。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 2  输入渠道
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--blue),#1b4965)">
+    <span class="sn">2</span> 输入渠道：精选高效知识来源
+  </div>
+  <p class="section-intro">经过筛选的高效知识渠道 + 干扰陷阱警示。选择 5-10 个融入日常，远离算法劫持型平台。</p>
+
+  <div class="box info" style="margin-bottom:20px"><strong>🔬 筛选标准：为什么"少即是多"</strong>Sweller（1988） <a href="https://scholar.google.com/scholar?q=Sweller+1988+cognitive+load+problem+solving" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的认知负荷理论指出，工作记忆容量有限（同时处理 4±1 个信息块）。输入渠道过多会造成<strong>外在认知负荷</strong>——不是在学习，而是在切换。筛选原则：<strong>用户主动控制注意力 + 内容深度高 + 非算法推荐</strong>。</div>
+
+  <!-- 2.1 推荐渠道总览 -->
+  <div class="card">
+    <h3>2.1 推荐渠道（6 大类 · 精选）</h3>
+    <table>
+      <tr><th>类别</th><th>核心渠道</th><th>选择理由</th></tr>
+      <tr><td><strong>深度阅读</strong></td><td>实体书 · 电子书 · 图书馆 · 论文 · 长文/报告 · Newsletter/RSS</td><td>用户主动选择，注意力完全可控，知识密度最高</td></tr>
+      <tr><td><strong>知识音频</strong></td><td>深度播客 · 听书软件（樊登/得到）· 公开课 · 播客 Shownotes</td><td>伴随式学习，不占视觉通道，降低认知负荷</td></tr>
+      <tr><td><strong>长视频</strong></td><td>B 站知识区 · YouTube 教育频道 · TED · 纪录片</td><td>主动搜索+长内容，非算法短推送</td></tr>
+      <tr><td><strong>专家/博客</strong></td><td>知名学者网站 · 知乎 · 垂直博客（Dan Koe 类）· AI 对话</td><td>直接获取专家思考，非二手转述</td></tr>
+      <tr><td><strong>实践输出</strong></td><td>解决问题 · 复盘 · 错误分析 · 写作 · 教别人</td><td>最强知识加工方式（详见 §3）</td></tr>
+      <tr><td><strong>人际对话</strong></td><td>请教专家 · 深度 1 对 1 · 行业交流 · 教学输出</td><td>高质对话产生意外连接</td></tr>
+    </table>
+  </div>
+
+  <!-- Channel search tools -->
+  <div class="card">
+    <div class="ch-tools">
+      <input type="search" id="chSearch" placeholder="🔍 搜索渠道名称或描述，如：播客 / 博物馆 / 复盘…">
+    </div>
+    <div class="ch-tools" id="chChips">
+      <button class="chip on" data-cat="all">全部</button>
+      <button class="chip" data-cat="read">深度阅读</button>
+      <button class="chip" data-cat="audio">知识音频</button>
+      <button class="chip" data-cat="video">长视频</button>
+      <button class="chip" data-cat="expert">专家/博客</button>
+      <button class="chip" data-cat="practice">实践输出</button>
+      <button class="chip" data-cat="social">人际对话</button>
+    </div>
+    <div class="ch-count" id="chCount">共 36 条</div>
+  </div>
+
+  <!-- 2.2 深度阅读 -->
+  <div class="card ch-cat" data-cat="read">
+    <h3>2.2 深度阅读（8 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>📚 实体书精读 <span class="tag tag-easy">易</span><span class="tag tag-time">20min</span></h5><p>折角、批注、用自己话复述关键段落。纸质书零干扰，是最纯粹的深度阅读载体。</p></div>
+      <div class="ch"><h5>📱 电子书 <span class="tag tag-easy">易</span><span class="tag tag-time">20min</span></h5><p>Kindle/微信读书——便携且可搜索。注意关闭推送通知，避免跳出。</p></div>
+      <div class="ch"><h5>🏛️ 图书馆 <span class="tag tag-easy">易</span><span class="tag tag-time">60min</span></h5><p>物理环境自带"学习模式"，零干扰。索书卡发现冷门高价值书籍。</p></div>
+      <div class="ch"><h5>📄 论文/综述 <span class="tag tag-med">中</span><span class="tag tag-time">30min</span></h5><p>Google Scholar 搜索关键词。综述论文 = 该领域的知识地图。</p></div>
+      <div class="ch"><h5>📊 长文/报告 <span class="tag tag-med">中</span><span class="tag tag-time">30min</span></h5><p>研报、白皮书、行业报告——先读摘要和结论，再决定是否精读。</p></div>
+      <div class="ch"><h5>✉️ Newsletter/RSS <span class="tag tag-easy">易</span><span class="tag tag-time">10min</span></h5><p>用户主动订阅 = 注意力控制权在自己手里。3-5 个高质量源足够。</p></div>
+      <div class="ch"><h5>🔍 AI 对话追问 <span class="tag tag-easy">易</span><span class="tag tag-time">5min</span></h5><p>用追问方式深挖一个话题，至少追问 3 层。AI 不会劫持注意力。</p></div>
+      <div class="ch"><h5>📝 技术标准/专利 <span class="tag tag-hard">难</span><span class="tag tag-time">20min</span></h5><p>ISO/GB 标准 = 最佳实践的书面化。专利文件 = 企业技术布局。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.3 知识音频 -->
+  <div class="card ch-cat" data-cat="audio">
+    <h3>2.3 知识音频（5 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>🎙️ 深度播客 <span class="tag tag-easy">易</span><span class="tag tag-time">30min</span></h5><p>选择访谈类而非闲聊型。通勤/家务时听，不占视觉通道。</p></div>
+      <div class="ch"><h5>📖 播客 Shownotes <span class="tag tag-easy">易</span><span class="tag tag-time">3min</span></h5><p>每期播客的 shownotes 包含链接和参考书目，是深度阅读的入口。</p></div>
+      <div class="ch"><h5>🎧 听书软件 <span class="tag tag-easy">易</span><span class="tag tag-time">30min</span></h5><p>樊登读书、得到等——专业讲书人提炼核心，适合快速筛选值得精读的书。</p></div>
+      <div class="ch"><h5>🎓 公开课 <span class="tag tag-med">中</span><span class="tag tag-time">45min</span></h5><p>大学公开课（Coursera/edX/B 站搬运）——系统学习一个领域的最佳途径。</p></div>
+      <div class="ch"><h5>🗣️ 语音备忘 <span class="tag tag-easy">易</span><span class="tag tag-time">1min</span></h5><p>灵感来时用语音记录比打字更快速，之后整理成文字。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.4 长视频 -->
+  <div class="card ch-cat" data-cat="video">
+    <h3>2.4 长视频（5 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>📺 B 站知识区 <span class="tag tag-easy">易</span><span class="tag tag-time">15min</span></h5><p>主动搜索具体课题，10-30 分钟深度讲解。先看目录再决定是否精看。</p></div>
+      <div class="ch"><h5>▶️ YouTube 教育 <span class="tag tag-easy">易</span><span class="tag tag-time">15min</span></h5><p>3Blue1Brown/Kurzgesagt 等——全球顶级教育创作者。</p></div>
+      <div class="ch"><h5>🎤 TED/演讲 <span class="tag tag-easy">易</span><span class="tag tag-time">18min</span></h5><p>18 分钟浓缩一个领域核心思想，注意演讲结构而非只看内容。</p></div>
+      <div class="ch"><h5>📹 纪录片 <span class="tag tag-easy">易</span><span class="tag tag-time">45min</span></h5><p>高质量纪录片是跨领域学习的捷径。</p></div>
+      <div class="ch"><h5>📝 视频字幕/文稿 <span class="tag tag-easy">易</span><span class="tag tag-time">5min</span></h5><p>视频转文稿后可搜索、可引用，效率远高于反复看视频。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.5 专家/博客 -->
+  <div class="card ch-cat" data-cat="expert">
+    <h3>2.5 专家/博客（6 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>🌐 知名学者网站 <span class="tag tag-med">中</span><span class="tag tag-time">15min</span></h5><p>直接访问领域专家的个人网站，获取一手思考而非二手转述。</p></div>
+      <div class="ch"><h5>✍️ 高质量博客 <span class="tag tag-easy">易</span><span class="tag tag-time">10min</span></h5><p>Dan Koe、Paul Graham、Naval Ravikant 类——独立思考者的长文输出。</p></div>
+      <div class="ch"><h5>💬 知乎 <span class="tag tag-easy">易</span><span class="tag tag-time">10min</span></h5><p>高赞回答往往是知识的二次加工产物。主动搜索，不刷推荐流。</p></div>
+      <div class="ch"><h5>📊 数据/图表 <span class="tag tag-med">中</span><span class="tag tag-time">5min</span></h5><p>刻意练习阅读图表——问"这个数据说明了什么？"而非只看结论。</p></div>
+      <div class="ch"><h5>🏷️ 产品拆解 <span class="tag tag-easy">易</span><span class="tag tag-time">5min</span></h5><p>买新产品后拆解功能列表和设计逻辑——活的产品思维案例。</p></div>
+      <div class="ch"><h5>❓ 提问 <span class="tag tag-easy">易</span><span class="tag tag-time">5min</span></h5><p>提出一个好问题本身就是知识加工——它迫使你明确自己的认知边界。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.6 实践输出 -->
+  <div class="card ch-cat" data-cat="practice">
+    <h3>2.6 实践输出（7 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>🛠️ 动手解决问题 <span class="tag tag-s">S</span><span class="tag tag-time">30min</span></h5><p>用新知识解决真实问题——最强的知识连接方式。</p></div>
+      <div class="ch"><h5>✍️ 写作输出 <span class="tag tag-s">S</span><span class="tag tag-time">20min</span></h5><p>写一篇短文——写作是最强的知识整理方式。</p></div>
+      <div class="ch"><h5>📊 项目复盘 <span class="tag tag-a">A</span><span class="tag tag-time">20min</span></h5><p>记录"假设→行动→结果→偏差→教训"五栏。</p></div>
+      <div class="ch"><h5>📝 错误分析 <span class="tag tag-s">S</span><span class="tag tag-time">10min</span></h5><p>记录错误并分析"我当时的假设是什么，为什么错了"。</p></div>
+      <div class="ch"><h5>🧪 小实验 <span class="tag tag-a">A</span><span class="tag tag-time">15min</span></h5><p>用 70% 把握的小实验验证新知识，允许失败。</p></div>
+      <div class="ch"><h5>🗺️ 旅行见闻 <span class="tag tag-easy">易</span><span class="tag tag-time">持续</span></h5><p>用所有感官记录差异——环境变化是强大的情境编码。</p></div>
+      <div class="ch"><h5>🍳 新技能练习 <span class="tag tag-easy">易</span><span class="tag tag-time">30min</span></h5><p>做一道新菜、修一件东西——实践产生的情境记忆最深刻。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.7 人际对话 -->
+  <div class="card ch-cat" data-cat="social">
+    <h3>2.7 人际对话（5 种）</h3>
+    <div class="ch-grid">
+      <div class="ch"><h5>🧑‍🏫 请教专家 <span class="tag tag-a">A</span><span class="tag tag-time">15min</span></h5><p>带着具体问题去请教，而非泛泛而谈。</p></div>
+      <div class="ch"><h5>👥 深度 1 对 1 <span class="tag tag-a">A</span><span class="tag tag-time">30min</span></h5><p>设定明确议题的对话，比闲聊有效 10 倍。</p></div>
+      <div class="ch"><h5>🎓 教别人 <span class="tag tag-s">S</span><span class="tag tag-time">15min</span></h5><p>教学是最强的知识加工方式——详见 §3 连接机制。</p></div>
+      <div class="ch"><h5>🤝 行业交流 <span class="tag tag-med">中</span><span class="tag tag-time">60min</span></h5><p>跨行业交流能找到意想不到的结构相似性。</p></div>
+      <div class="ch"><h5>👨‍👩‍👧 家庭对话 <span class="tag tag-easy">易</span><span class="tag tag-time">10min</span></h5><p>向家人解释你学到的东西——如果他们听懂了，说明你真懂了。</p></div>
+    </div>
+  </div>
+
+  <!-- 2.8 推荐渠道深度解析 -->
+  <div class="card">
+    <h3>2.8 推荐渠道深度解析：为什么这些渠道有效</h3>
+    <div class="ts-grid">
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">📚 深度阅读（实体书/电子书）</div>
+        <div class="cause"><strong>认知机制：</strong>Maryanne Wolf（2018） <a href="https://scholar.google.com/scholar?q=Maryanne+Wolf+2018+reader+come+home" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>《Reader, Come Home》研究表明，深度阅读激活大脑的"沉浸式认知回路"——前额叶皮层（推理）、颞叶（语言）、角回（整合）协同工作。这种协同在碎片阅读中不会发生。</div>
+        <div class="fix"><strong>具体做法：</strong>每天固定 20 分钟无干扰阅读。关闭手机通知，用实体书或 Kindle（无推送）。读完一章后合上书，用自己话复述核心要点（提取练习）。<br><strong>举例：</strong>读《思考，快与慢》→ 合上书 → 写"系统1和系统2的区别是什么？我在什么场景下会用到这个概念？"</div>
+      </div>
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">🏛️ 图书馆</div>
+        <div class="cause"><strong>认知机制：</strong>环境心理学研究表明，特定物理环境会激活对应的认知模式（环境启动效应）。图书馆的"安静+书籍+学习氛围"自动激活深度学习模式——这是你在家里沙发上看书时不会发生的。</div>
+        <div class="fix"><strong>具体做法：</strong>每周去一次图书馆，不带目的地浏览书架。索书卡发现冷门高价值书籍的概率远高于算法推荐。<br><strong>举例：</strong>在图书馆偶然翻到一本《供应链设计》→ 发现其中的"牛鞭效应"和你工作中的库存波动完全吻合 → 这种"意外发现"在算法推荐中几乎不可能发生。</div>
+      </div>
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">🎙️ 深度播客</div>
+        <div class="cause"><strong>认知机制：</strong>播客是"伴随式学习"——不占视觉通道，可以在通勤/家务时听。Feldon & Kafai（2019） <a href="https://scholar.google.com/scholar?q=Feldon+Kafai+2019+audio+learning+cognitive+load" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>研究表明，音频学习在"低认知负荷"场景下效果接近视觉学习。但关键区别：必须是<strong>主动选择</strong>的内容，而非算法推送。</div>
+        <div class="fix"><strong>具体做法：</strong>订阅 3-5 个高质量播客（如：《得意忘形》《忽左忽右》《Acquired》）。听的时候用语音备忘录记录 3 个关键词。听完当天，用提取练习复述 1 个核心观点。<br><strong>举例：</strong>听《Acquired》讲 Costco 商业模式 → 记录"会员制+低毛利+高周转" → 当天用来分析你公司的供应商定价策略。</div>
+      </div>
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">🌐 知名学者网站/高质量博客</div>
+        <div class="cause"><strong>认知机制：</strong>直接获取专家的一手思考，而非二手转述。Paul Graham 的文章、Naval Ravikant 的推特线程、Dan Koe 的博客——这些是独立思考者经过深度加工后的输出，信息密度远高于算法推荐的内容。</div>
+        <div class="fix"><strong>具体做法：</strong>用 RSS 订阅 5-10 个高质量博客。每周固定时间阅读，每篇写 3 句话总结。<br><strong>举例：</strong>Dan Koe 写过一篇"The Art of Learning" → 提炼出"学习=输入×加工×输出" → 和本手册的闭环框架完全一致 → 这种跨来源的知识印证本身就是一种连接。</div>
+      </div>
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">✍️ 写作输出</div>
+        <div class="cause"><strong>认知机制：</strong>写作是"精细化编码"的终极形式——你必须把模糊的想法转化为清晰的文字。Kellogg（2008） <a href="https://scholar.google.com/scholar?q=Kellogg+2008+training+advanced+writing+skills+deliberate+practice" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>研究表明，写作任务激活的大脑区域与深度阅读高度重叠，但增加了前额叶的"执行控制"区域——这意味着写作不仅巩固知识，还训练思维的精确性。</div>
+        <div class="fix"><strong>具体做法：</strong>每周写一篇 300 字的"向 XX 解释 Y"短文。不用发出去，写给自己看就行。<br><strong>举例：</strong>学了"价格锚定" → 写一篇"向我妈解释什么是价格锚定" → 发现"第一个看到的价格会影响后面所有判断"这个解释比术语定义清晰 10 倍。</div>
+      </div>
+      <div class="ts" style="border-top-color:var(--green)">
+        <div class="symptom" style="color:var(--green)">🎧 听书软件（樊登/得到）</div>
+        <div class="cause"><strong>认知机制：</strong>专业讲书人已经完成了"提炼核心+去术语化+举例"的加工——你接收的是经过二次加工的知识，认知负荷低于自己读原书。但注意：听书是<strong>筛选工具</strong>，不是<strong>替代品</strong>。听到好书后，应该去读原书。</div>
+        <div class="fix"><strong>具体做法：</strong>用听书快速筛选 10 本书 → 选出 2 本最值得精读的 → 读原书 → 用提取练习巩固。<br><strong>举例：</strong>听樊登讲《认知天性》 → 发现"检索练习"这个概念 → 去读原书（Roediger 是作者之一）→ 原书中的实验细节比讲书丰富 10 倍。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.9 干扰陷阱警示区 -->
+  <div class="card" style="border-left:4px solid var(--red)">
+    <h3 style="color:var(--red)">⚠️ 2.9 干扰陷阱：这些渠道为什么有害（附科学研究）</h3>
+    <p>以下渠道被排除，不是因为它们"没有知识"，而是因为<strong>干扰远大于学习机会</strong>。每条都有科学研究支持。</p>
+    <div class="ts-grid">
+      <div class="ts">
+        <div class="symptom">📱 短视频（抖音/TikTok/Reels）</div>
+        <div class="cause"><strong>干扰机制：</strong>15 秒节奏 + 算法推荐 + 无限下滑 = 多巴胺劫持。Alter（2017） <a href="https://scholar.google.com/scholar?q=Adam+Alter+2017+irresistible+addictive+technology" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>《Irresistible》研究发现，短视频平台的设计模式（可变奖励+无限滚动）与赌博机的成瘾机制相同——每次下滑都是一次"拉老虎机"，大脑释放多巴胺期待"下一个更好的内容"。</div>
+        <div class="fix"><strong>具体影响：</strong>Ward 等人（2017） <a href="https://scholar.google.com/scholar?q=Ward+Duke+2017+brain+drain+smartphone+cognitive+capacity" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>发表在《Journal of the Association for Consumer Research》的研究表明，仅仅是<strong>手机的存在</strong>（即使关机放在桌上）就会降低认知容量——可用认知资源减少约 10%。短视频的"即时满足回路"会训练大脑回避需要延迟满足的深度学习任务。<br><strong>替代：</strong>B 站/YouTube 长视频（主动搜索，10-30 分钟深度内容）</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">🔥 微博/社交 Feed（热搜、推荐流）</div>
+        <div class="cause"><strong>干扰机制：</strong>算法优化的是"停留时长"而非"知识传递"。Harris（2016 <a href="https://scholar.google.com/scholar?q=Tristan+Harris+2016+technology+hijacks+attention" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>，前 Google 设计伦理学家）揭露：社交平台的核心指标是"参与度"（engagement），而<strong>愤怒内容的参与度是理性内容的 6 倍</strong>——这意味着算法会优先推送让你情绪激动的内容，而非让你变聪明的内容。</div>
+        <div class="fix"><strong>具体影响：</strong>Twenge & Campbell（2018） <a href="https://scholar.google.com/scholar?q=Twenge+Campbell+2018+screen+time+psychological+well+being" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>对 50 万青少年的研究发现，每天社交媒体使用超过 3 小时的青少年，抑郁风险增加 35%。在知识获取层面，社交媒体的"碎片化信息流"导致"注意力残留"（Leroy, 2009 <a href="https://scholar.google.com/scholar?q=Leroy+2009+attention+residue+switching+tasks" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）——你在社交 Feed 上停留的每一秒，都在消耗后续深度任务的认知资源。<br><strong>替代：</strong>RSS/Newsletter（用户主动订阅，无算法干扰）</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">💬 弹幕/直播弹幕</div>
+        <div class="cause"><strong>干扰机制：</strong>实时滚动的文字分散视觉注意力，工作记忆被弹幕内容占用。Sweller（1988） <a href="https://scholar.google.com/scholar?q=Sweller+1988+cognitive+load+problem+solving" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>认知负荷理论指出，工作记忆容量有限——弹幕内容占据了本应用于深度加工视频主体的工作记忆资源。</div>
+        <div class="fix"><strong>具体影响：</strong>弹幕中的"情绪化表达"（如"666""哈哈哈哈哈"）激活的是即时满足回路而非深度加工回路。长期暴露会训练大脑偏好"轻量级刺激"，降低对深度内容的耐受力。<br><strong>替代：</strong>关闭弹幕，或看文稿/字幕版本</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">📢 社交群聊（微信群/QQ群）</div>
+        <div class="cause"><strong>干扰机制：</strong>信噪比极低——99% 是闲聊、表情包、重复转发。Stothart 等人（2015） <a href="https://scholar.google.com/scholar?q=Stothart+Mitchum+2015+attentional+cost+cell+phone+notification" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>发表在《Journal of Experimental Psychology》的研究发现，仅仅是<strong>收到通知的意识</strong>（即使不看手机）就会分散注意力，降低任务表现。</div>
+        <div class="fix"><strong>具体影响：</strong>"随时可能有新消息"的预期创造了"持续性部分注意力"（continuous partial attention, Stone, 2009 <a href="https://scholar.google.com/scholar?q=Linda+Stone+continuous+partial+attention" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）——你的注意力永远不是 100% 在当前任务上，而是被"可能有新消息"的预期分散了一部分。<br><strong>替代：</strong>定时查看（如每天 3 个固定时段）而非实时在线；有价值的内容转存到笔记系统</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">📺 电商直播/带货话术</div>
+        <div class="cause"><strong>干扰机制：</strong>商业意图驱动，所有"知识"都是为了促成购买。限时抢购制造焦虑（"还剩 3 件！"），破坏理性决策能力——这恰好与本手册 §1 认知原理中"情绪影响决策"的机制相反：它是<strong>利用</strong>情绪来破坏你的理性判断。</div>
+        <div class="fix"><strong>具体影响：</strong>冲动购买后的"后悔感"消耗认知资源，且"限时"话术训练大脑在焦虑状态下做决策——这与深度学习需要的"冷静+专注"状态完全相反。<br><strong>替代：</strong>产品评测长文（独立测评者的深度分析）</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">📲 算法推荐平台（小红书/Instagram/Facebook/即刻）</div>
+        <div class="cause"><strong>干扰机制：</strong>推荐算法的核心指标是"互动率"而非"知识密度"。内容越情绪化、越极端、越碎片化，越容易被推荐——这与深度学习的方向完全相反。Zuboff（2019） <a href="https://scholar.google.com/scholar?q=Zuboff+2019+surveillance+capitalism" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>《监控资本主义时代》揭示：这些平台的商业模式依赖"行为剩余"（behavioral surplus）——你的每一次点击、停留、滑动都在被收集和利用。</div>
+        <div class="fix"><strong>具体影响：</strong>Lin 等人（2016） <a href="https://scholar.google.com/scholar?q=Lin+2016+social+media+social+comparison+self+efficacy" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>研究发现，社交媒体上的"社会比较"（social comparison）会降低自我效能感——你在刷别人"完美生活"的同时，消耗的是本应用于深度学习的认知资源和情绪能量。<br><strong>替代：</strong>知名学者网站/高质量博客（Dan Koe 类独立思考者）</div>
+      </div>
+    </div>
+    <div class="box danger" style="margin-top:16px"><strong>🔴 核心原则</strong>判断一个渠道是否应该使用，问自己一个问题：<strong>"使用这个渠道时，注意力控制权在谁手里？"</strong>如果答案是"在算法手里"——排除。如果答案是"在我自己手里"——可以保留。</div>
+  </div>
+
+  <div class="card">
+    <div class="box primary"><strong>💡 即时行动</strong>从以上 36 种推荐渠道中，圈出<strong>5 种你本周已经在使用</strong>的，再选择<strong>2 种你想新增</strong>的。然后检查：你每天花在"干扰陷阱"上的时间有多少？如果超过 30 分钟，先削减干扰，再增加渠道。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 3  连接机制
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--purple),#9c6644)">
+    <span class="sn">3</span> 连接机制：5 种经过验证的加工方式
+  </div>
+  <p class="section-intro">获取碎片是输入端，连接碎片是处理端。以下 5 种机制均有严格的实验支持，按对记忆的强化效果从强到弱排列。</p>
+
+  <div class="card">
+    <h3>连接的本质</h3>
+    <p>知识连接不是玄学，而是可观察的认知行为：当你把一个新信息点与一个已有信息点建立关联时，两个信息点的提取概率都会提高。这个关联可以是因果关系、类比关系、对比关系、应用场景关系等。</p>
+    <div class="quote"><strong>核心公式：</strong>知识价值 = 信息点数量 × 连接密度 × 连接质量。三个因子缺一不可。100 个孤立的碎片 &lt; 10 个相互连接的概念。</div>
+
+    <!-- SVG: Connection efficiency pyramid -->
+    <svg viewBox="0 0 900 560" role="img" aria-label="事件连接效率分层金字塔：S级最强，C级最弱" style="width:100%;margin:20px 0;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border-light)">
+      <g font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+        <polygon points="60,520 600,520 565,400 95,400" fill="#9c6644"/>
+        <polygon points="98,394 562,394 527,274 133,274" fill="#1b4965"/>
+        <polygon points="136,268 524,268 489,148 171,148" fill="#6a4c93"/>
+        <polygon points="174,142 486,142 451,22 209,22" fill="#b3541e"/>
+        <text x="330" y="62" text-anchor="middle" fill="#fff" font-size="24" font-weight="800">S级</text>
+        <text x="330" y="92" text-anchor="middle" fill="#fff" font-size="14.5">问题解决 · 教学输出 · 冲突/失败</text>
+        <text x="330" y="118" text-anchor="middle" fill="#ffd9c2" font-size="13">★★★★★ · 连接强度最高</text>
+        <text x="330" y="196" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">A级</text>
+        <text x="330" y="224" text-anchor="middle" fill="#fff" font-size="14.5">跨域类比 · 情绪高峰</text>
+        <text x="330" y="248" text-anchor="middle" fill="#e3d5f5" font-size="13">★★★★ · 可迁移的思维框架</text>
+        <text x="330" y="324" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">B级</text>
+        <text x="330" y="352" text-anchor="middle" fill="#fff" font-size="14.5">社交讨论</text>
+        <text x="330" y="376" text-anchor="middle" fill="#cfe0ee" font-size="13">★★★ · 认知失调驱动理解</text>
+        <text x="330" y="450" text-anchor="middle" fill="#fff" font-size="22" font-weight="800">C级 · 单纯阅读</text>
+        <text x="330" y="478" text-anchor="middle" fill="#f0e2d8" font-size="13">★★ · 原材料输入，必须经事件升级</text>
+        <g stroke="#b8b0a0" stroke-width="1.2" stroke-dasharray="3 3">
+          <line x1="466" y1="82" x2="636" y2="82"/>
+          <line x1="506" y1="208" x2="636" y2="208"/>
+          <line x1="547" y1="334" x2="636" y2="334"/>
+          <line x1="582" y1="460" x2="636" y2="460"/>
+        </g>
+        <text x="648" y="76" fill="#26241f" font-size="14.5" font-weight="700">一次S级事件的连接强度</text>
+        <text x="648" y="96" fill="#6f6a5e" font-size="13">≈ 十次C级单纯阅读</text>
+        <text x="648" y="202" fill="#26241f" font-size="14.5" font-weight="700">双向映射</text>
+        <text x="648" y="222" fill="#6f6a5e" font-size="13">知识从"会用"升级为"会迁移"</text>
+        <text x="648" y="328" fill="#26241f" font-size="14.5" font-weight="700">观点碰撞</text>
+        <text x="648" y="348" fill="#6f6a5e" font-size="13">对话太舒服 = 连接没有发生</text>
+        <text x="648" y="454" fill="#26241f" font-size="14.5" font-weight="700">保留率仅约10%</text>
+        <text x="648" y="474" fill="#6f6a5e" font-size="13">没有后续事件，原材料不会变产品</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- 机制 1 -->
+  <div class="mech" style="border-top:4px solid var(--primary)">
+    <div class="mech-head">
+      <h4>🥇 机制 1：提取练习（Retrieval Practice）</h4>
+      <span class="tag tag-s">效果最强</span>
+    </div>
+    <div class="mech-body">
+      <p><strong>研究基础</strong>：Roediger & Karpicke（2006） <a href="https://scholar.google.com/scholar?q=Roediger+Karpicke+2006+test+enhanced+learning" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>证明提取练习的记忆保持效果是重复阅读的 2.4 倍。Rowland（2014） <a href="https://scholar.google.com/scholar?q=Rowland+2014+testing+effect+meta+analysis" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的元分析（159 项研究）确认该效应在不同年龄段、不同材料类型中均稳健存在。Dunlosky 等人（2013） <a href="https://scholar.google.com/scholar?q=Dunlosky+2013+effective+learning+techniques" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>在综述中将提取练习评为"高效"学习技术（最高评级）。</p>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>学完后合上书</strong>，用白纸或空白文档默写你记住的核心要点</li>
+        <li><strong>对照原文检查</strong>，标记遗漏和错误的部分</li>
+        <li><strong>针对遗漏部分</strong>，重新学习后再次提取</li>
+        <li><strong>间隔重复</strong>：第 1 天、第 3 天、第 7 天、第 30 天各提取一次</li>
+      </ol>
+      <div class="box success"><strong>适用场景</strong>：任何需要记住内容的学习——读书、听课、看报告。效果最好，但需要主动努力。</div>
+    </div>
+  </div>
+
+  <!-- 机制 2 -->
+  <div class="mech" style="border-top:4px solid var(--green)">
+    <div class="mech-head">
+      <h4>🥇 机制 2：教学输出（Learning by Teaching）</h4>
+      <span class="tag tag-s">效果最强</span>
+    </div>
+    <div class="mech-body">
+      <p><strong>研究基础</strong>：Fiorella & Mayer（2015） <a href="https://scholar.google.com/scholar?q=Fiorella+Mayer+2015+learning+generative+activity" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>系统综述了"学习中的生成活动"，发现教学输出是最有效的生成活动之一。教学迫使学习者将模糊理解转化为清晰表达，暴露知识漏洞——这种"自以为懂但说不清楚"的认知落差，是教学输出强化记忆的核心机制。</p>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>选概念</strong>：选一个你刚学会但不太确定自己真懂的概念</li>
+        <li><strong>定听众</strong>：想象向一个 12 岁孩子或非本领域的人解释</li>
+        <li><strong>写草稿</strong>：用纯白话写一段解释，禁止专业术语</li>
+        <li><strong>找漏洞</strong>：标记"这里我其实不太确定"的地方，回去查资料填补</li>
+        <li><strong>输出</strong>：讲给真人听或发到社交媒体</li>
+      </ol>
+      <div class="box success"><strong>适用场景</strong>：学完新概念后的 24 小时内。如果你无法用简单语言解释一个概念，说明你还没有真正理解它。</div>
+    </div>
+  </div>
+
+  <!-- 机制 3 -->
+  <div class="mech" style="border-top:4px solid var(--purple)">
+    <div class="mech-head">
+      <h4>🥈 机制 3：精细化编码（Elaborative Encoding）</h4>
+      <span class="tag tag-a">效果强</span>
+    </div>
+    <div class="mech-body">
+      <p><strong>研究基础</strong>：Craik & Tulving（1975） <a href="https://scholar.google.com/scholar?q=Craik+Tulving+1975+depth+of+processing" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>证明，对信息进行深层语义加工比浅层加工的记忆效果好 2-3 倍。这是"加工水平理论"的核心预测。</p>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>问"为什么"</strong>：这个概念为什么成立？背后的逻辑是什么？</li>
+        <li><strong>问"像什么"</strong>：这让我想起了什么已知的东西？（建立类比）</li>
+        <li><strong>问"用在哪"</strong>：这个知识能在什么具体情境中使用？</li>
+        <li><strong>写下来</strong>：在笔记空白处写下这些关联，不要只在脑子里想</li>
+      </ol>
+      <div class="box success"><strong>适用场景</strong>：阅读和学习时的即时加工。最容易融入日常学习习惯的机制。</div>
+    </div>
+  </div>
+
+  <!-- 机制 4 -->
+  <div class="mech" style="border-top:4px solid var(--blue)">
+    <div class="mech-head">
+      <h4>🥈 机制 4：问题解决（Problem-Solving）</h4>
+      <span class="tag tag-a">效果强</span>
+    </div>
+    <div class="mech-body">
+      <p><strong>研究基础</strong>：基于认知学徒制理论（Collins, Brown & Newman, 1989 <a href="https://scholar.google.com/scholar?q=Collins+Brown+Newman+1989+cognitive+apprenticeship" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）和情境学习理论（Lave & Wenger, 1991 <a href="https://scholar.google.com/scholar?q=Lave+Wenger+1991+situated+learning" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）——在真实情境中应用知识比抽象学习更能促进迁移。</p>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>遇到问题时先不搜索</strong>，问自己："我之前学过的哪个概念可能适用？"</li>
+        <li><strong>尝试应用</strong>，记录结果（成功或失败）</li>
+        <li><strong>复盘</strong>：写 3 句话——"我尝试了 X，结果是 Y，我学到了 Z"</li>
+        <li><strong>记录到"问题-知识映射日志"</strong>：用 X 解决了 Y 情境</li>
+      </ol>
+      <div class="box success"><strong>适用场景</strong>：遇到真实问题时。每周至少设定一个"必须用新知识解决"的具体问题。</div>
+    </div>
+  </div>
+
+  <!-- 机制 5 -->
+  <div class="mech" style="border-top:4px solid var(--teal)">
+    <div class="mech-head">
+      <h4>🥉 机制 5：社交讨论（Social Discussion）</h4>
+      <span class="tag tag-b">效果中等</span>
+    </div>
+    <div class="mech-body">
+      <p><strong>研究基础</strong>：观点采择和认知失调理论表明，当别人提出不同观点时，大脑被迫重新审视自己的认知框架，这种张力促进深层理解（Festinger, 1957 <a href="https://scholar.google.com/scholar?q=Festinger+1957+cognitive+dissonance" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>; Piaget, 1985 <a href="https://scholar.google.com/scholar?q=Piaget+1985+equilibration+cognitive+structures" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>）。</p>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>不要只和"志同道合"的人讨论</strong>，刻意寻找有不同观点的人</li>
+        <li><strong>每次讨论后写一句</strong>："我改变了什么看法"或"我坚持了什么看法及原因"</li>
+        <li><strong>将闲聊升级为"主题讨论"</strong>：设定明确议题，限时 15 分钟</li>
+      </ol>
+      <div class="box warn"><strong>⚠️ 陷阱</strong>：低质量的社交讨论（确认偏误的回音室）不仅不能产生连接，反而强化错误认知。如果对话太舒服，说明连接没有发生。</div>
+    </div>
+  </div>
+
+  <!-- 场景推荐 -->
+  <div class="card">
+    <h3>机制 × 渠道匹配</h3>
+    <p>不同渠道天然适合不同的连接机制：</p>
+    <table>
+      <tr><th>渠道</th><th>最佳匹配机制</th><th>推荐触发方法</th></tr>
+      <tr><td><strong>书籍/论文</strong></td><td>提取练习 + 教学输出</td><td>读完后合上书复述，24 小时内向他人解释</td></tr>
+      <tr><td><strong>播客/音频</strong></td><td>问题解决 + 社交讨论</td><td>听完当天找一个相关话题与人讨论</td></tr>
+      <tr><td><strong>短视频/文章</strong></td><td>精细化编码 + 问题解决</td><td>不要只收藏，当天想一个应用场景</td></tr>
+      <tr><td><strong>人际对话</strong></td><td>社交讨论 + 精细化编码</td><td>主动引入不同领域的概念进行比较</td></tr>
+      <tr><td><strong>实践/动手</strong></td><td>问题解决 + 提取练习</td><td>刻意记录"哪里出了错"和"为什么"</td></tr>
+      <tr><td><strong>环境观察</strong></td><td>精细化编码 + 教学输出</td><td>把观察到的现象与你专业领域对比</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="box primary"><strong>💡 即时行动</strong>选择<strong>1 种机制</strong>，今天就用。如果你不确定选哪个，从<strong>提取练习</strong>开始——它是最简单、最有效的起点。学完本节后，合上这个页面，写下你记住的 3 个要点。然后回来检查。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 4  存储·检索·淘汰
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-head" style="background:linear-gradient(135deg,#1b4965,var(--blue))">
+    <span class="sn">4</span> 存储·检索·淘汰：让知识"活"起来
+  </div>
+  <p class="section-intro">输入和加工解决"知识进来"的问题。但知识管理的真正价值不在"进来"，在<strong>"调用"</strong>——在你需要的时候，能不能准确找到并使用。没有存储、检索和淘汰机制，加工出来的连接会再次丢失。</p>
+
+  <div class="card">
+    <h3>4.1 闭环的完整逻辑</h3>
+    <p>前面 §1-§3 覆盖了闭环的前半段。完整闭环还需要后半段：</p>
+    <table>
+      <tr><th>阶段</th><th>做什么</th><th>不做的后果</th></tr>
+      <tr><td><strong>输入</strong>（§2）</td><td>从 50 种渠道获取碎片</td><td>没有原材料</td></tr>
+      <tr><td><strong>加工</strong>（§3）</td><td>用 5 种机制建立连接</td><td>碎片孤立，快速遗忘</td></tr>
+      <tr><td><strong>存储</strong>（本节）</td><td>写入可检索的系统</td><td>连接做完了但找不到，等于没做</td></tr>
+      <tr><td><strong>检索</strong>（本节）</td><td>在需要时能调出来</td><td>知识存在但不可用，是死知识</td></tr>
+      <tr><td><strong>反馈</strong>（本节）</td><td>记录应用效果，修正认知</td><td>重复犯同样的错误</td></tr>
+      <tr><td><strong>淘汰</strong>（本节）</td><td>清理过时知识</td><td>认知带宽被垃圾占用</td></tr>
+    </table>
+    <div class="quote"><strong>核心洞察：</strong>一个知识管理系统如果只有输入和加工，没有存储、检索和淘汰，就像一个只收快递不拆包裹的家——东西越来越多，但你永远找不到要用的那一件。</div>
+  </div>
+
+  <!-- 4.2 存储 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--green),var(--teal))">S</div>
+      <div class="principle-title">存储原则：加工后的连接必须外化</div>
+    </div>
+    <div class="principle-body">
+      <p>加工产生的连接（"价格锚定 ↔ 采购谈判"）如果只停留在脑子里，会在数天内遗忘。必须<strong>写下来</strong>——写入一个你可以回头查找的系统。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Hutchins（1995） <a href="https://scholar.google.com/scholar?q=Hutchins+1995+cognition+in+the+wild" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的认知分布式理论指出，人类认知不仅发生在大脑内部，还分布在人、工具和环境之间。外部化记录（写笔记、画图、建索引）是认知系统的核心组成部分，不是"辅助"，而是认知本身的一部分。Kirsh & Maglio（1994） <a href="https://scholar.google.com/scholar?q=Kirsh+Maglio+1994+epistemic+pragmatic+action" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>区分了"认识动作"（epistemic action）和"实用动作"（pragmatic action）——写笔记就是一种认识动作，它改变了认知任务的性质。</div>
+      <p><strong>存储的三个层次</strong>：</p>
+      <ol class="steps">
+        <li><strong>临时层</strong>：速记工具（备忘录、Flomo）——捕获灵感和即时连接，当天整理</li>
+        <li><strong>工作层</strong>：笔记系统（Obsidian、Logseq）——结构化存储，支持双向链接和搜索</li>
+        <li><strong>归档层</strong>：知识库（文件系统、RAG 索引）——长期保存，支持语义检索</li>
+      </ol>
+      <div class="box warn"><strong>⚠️ 常见错误</strong>：把所有东西都堆在一个层级。临时层应该每天清理（整理或删除），工作层应该每周维护（建立连接、补充标签），归档层应该每月审计（检查索引完整性）。</div>
+    </div>
+  </div>
+
+  <!-- 4.3 检索 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))">R</div>
+      <div class="principle-title">检索设计：问法映射——让知识在需要时自动浮现</div>
+    </div>
+    <div class="principle-body">
+      <p>知识管理系统最常被忽视的问题是：<strong>我以后会怎么找这条知识？</strong>你今天学了"价格锚定"，三个月后在谈判中遇到困难时，你能想起来吗？</p>
+      <p>解决方案是<strong>问法映射</strong>：每条知识在存储时，同时记录"当我在什么场景下会需要这个知识"。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Tulving（1973） <a href="https://scholar.google.com/scholar?q=Tulving+1973+encoding+specificity+retrieval" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的编码特异性原则不仅适用于记忆，也适用于外部检索：检索线索与编码线索越匹配，检索成功率越高。问法映射本质上是在编码时就预设好未来的检索线索。Anderson & Lebiere（1998） <a href="https://scholar.google.com/scholar?q=Anderson+Lebiere+1998+atomic+components+thought" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的 ACT-R 理论也支持这一观点：记忆的可及性取决于编码时的上下文丰富度。</div>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>记录核心内容</strong>：这个概念是什么？（定义、原理）</li>
+        <li><strong>记录连接</strong>：这和什么有关？（类比、对比、因果）</li>
+        <li><strong>记录问法映射</strong>：以后我会在什么场景下需要这个？用什么样的问句会找到它？
+          <br><span class="muted">例如："价格锚定"的问法映射：「谈判怎么开价」「菜单为什么把贵的放前面」「供应商报价太高怎么办」</span>
+        </li>
+        <li><strong>记录来源</strong>：我从哪里学到的？（便于追溯和验证）</li>
+      </ol>
+      <div class="box success"><strong>💡 关键</strong>：问法映射不是给自己看的，是给<strong>三个月后的自己</strong>看的。那时候你已经忘了"价格锚定"这个词，但你记得"谈判开价"这个问题。问法映射就是连接"你记住的知识"和"你遇到的问题"之间的桥梁。</div>
+    </div>
+  </div>
+
+  <!-- 4.4 反馈 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--orange),#b8860b)">F</div>
+      <div class="principle-title">反馈回路：用过之后必须复盘</div>
+    </div>
+    <div class="principle-body">
+      <p>知识的价值最终体现在应用中。但应用本身不是终点——<strong>应用后的反馈</strong>才是知识真正升级的时刻。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Kolb（1984） <a href="https://scholar.google.com/scholar?q=Kolb+1984+experiential+learning" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的体验学习理论（Experiential Learning Theory）将学习定义为一个四阶段循环：具体体验 → 反思观察 → 抽象概念化 → 主动实验。缺少"反思观察"阶段，体验就只是经历，不会变成知识。Ericsson 等人（1993） <a href="https://scholar.google.com/scholar?q=Ericsson+Krampe+1993+deliberate+practice+expert+performance" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的刻意练习理论也强调，没有反馈的练习不会带来能力提升。</div>
+      <p><strong>反馈日志模板</strong>（每次应用知识后填写）：</p>
+      <ol class="steps">
+        <li><strong>用了什么知识</strong>：具体概念名称</li>
+        <li><strong>用在什么场景</strong>：问题描述</li>
+        <li><strong>结果如何</strong>：成功 / 部分成功 / 失败</li>
+        <li><strong>偏差在哪</strong>：预期和实际的差距是什么？</li>
+        <li><strong>需要修正什么</strong>：是我的理解有误，还是应用场景不匹配？</li>
+      </ol>
+      <div class="box warn"><strong>⚠️ 关键区分</strong>："我用了这个知识"不等于"这个知识有用"。只有当你记录了<strong>预期 vs 实际</strong>的偏差，才能真正从经验中学习。否则你只是在重复，不是在进化。</div>
+      <div class="box teal"><strong>🤝 补充：协作反馈</strong>个人复盘容易陷入盲区——你看不见自己看不见的东西。定期寻求<strong>外部反馈</strong>是突破认知盲区的关键：(1) 把你的解释讲给别人听，问"哪里不清楚？"；(2) 在讨论中记录"对方的哪个观点让我意外？"；(3) 定期和不同领域的人交流，寻找"我以为对但其实不对"的假设。Vygotsky（1978） <a href="https://scholar.google.com/scholar?q=Vygotsky+1978+mind+in+society" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的"最近发展区"理论表明，在他人帮助下能达到的认知水平，高于独自能达到的水平。</div>
+    </div>
+  </div>
+
+  <!-- 4.5 淘汰 -->
+  <div class="principle">
+    <div class="principle-head">
+      <div class="principle-num" style="background:linear-gradient(135deg,var(--red),#bc4749)">D</div>
+      <div class="principle-title">淘汰策略：知识也有保质期</div>
+    </div>
+    <div class="principle-body">
+      <p>知识不是"越多越好"。过时的知识占据认知带宽，干扰新知识的编码，甚至误导决策。一个健康的知识管理系统必须有淘汰机制。</p>
+      <div class="box info"><strong>🔬 研究基础</strong>Anderson（1990） <a href="https://scholar.google.com/scholar?q=Anderson+1990+adaptive+character+thought" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>的"理性分析"框架（Rational Analysis）提出，人类记忆的遗忘是适应性的——大脑会自动降低长时间未被检索的记忆的可及性，为新信息腾出空间。外部知识系统也应该模拟这一机制：定期审查、标记过时、归档或删除。</div>
+      <p><strong>淘汰的三档策略</strong>：</p>
+      <table>
+        <tr><th>档位</th><th>判断标准</th><th>动作</th></tr>
+        <tr>
+          <td><strong>更新</strong></td>
+          <td>知识仍然相关，但细节已过时（如：市场数据、技术版本）</td>
+          <td>更新内容，保留连接，标记"最后验证日期"</td>
+        </tr>
+        <tr>
+          <td><strong>归档</strong></td>
+          <td>知识仍有历史价值，但不再日常使用</td>
+          <td>移入归档区，保留索引，不再出现在日常检索中</td>
+        </tr>
+        <tr>
+          <td><strong>删除</strong></td>
+          <td>知识已被证伪，或完全被新知识替代</td>
+          <td>标记"已废弃"并说明原因，保留 1 个月后删除</td>
+        </tr>
+      </table>
+      <p><strong>具体做法</strong>：</p>
+      <ol class="steps">
+        <li><strong>每月审计</strong>：检查知识网络中的"孤立节点"——12 个月以上未被调用且无连接的知识条目</li>
+        <li><strong>标记时效</strong>：每条知识记录"最后验证日期"，超过 6 个月未验证的标记为"待核实"</li>
+        <li><strong>季度清理</strong>：每季度执行一次淘汰审查，将过时内容移入归档或删除</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 闭环总览 -->
+  <div class="card">
+    <h3>4.6 闭环总览</h3>
+    <div class="wf-overview">
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--blue),#1b4965)">入</div>
+        <h5>输入</h5>
+        <p>50 种渠道</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--green),var(--teal))">加</div>
+        <h5>加工</h5>
+        <p>5 种机制</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))">存</div>
+        <h5>存储</h5>
+        <p>三层结构</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--purple),#9c6644)">检</div>
+        <h5>检索</h5>
+        <p>问法映射</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--orange),#b8860b)">用</div>
+        <h5>应用</h5>
+        <p>解决问题</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--red),#bc4749)">馈</div>
+        <h5>反馈</h5>
+        <p>偏差复盘</p>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,#555,#333)">淘</div>
+        <h5>淘汰</h5>
+        <p>归档/更新/删除</p>
+      </div>
+    </div>
+    <div class="box primary"><strong>闭环逻辑</strong>：输入提供原材料，加工建立连接，存储让连接持久，检索让连接可用，应用检验连接，反馈修正连接，淘汰清理无效连接。七个环节全部打通，知识才会从"我看过"变成"我能用"，从"我能用"变成"我用得好"。</div>
+  </div>
+
+  <!-- 九层 × 闭环映射 -->
+  <div class="card">
+    <h3>4.7 闭环 × <a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重阶梯">九重阶梯</a>映射</h3>
+    <p>七步闭环和<a href="/metacognition/nine-layer-model/" class="wiki-link" title="查看：九重阶梯">九重阶梯</a>是同一枚硬币的两面——闭环描述"系统怎么运转"，九层描述"知识到达了哪一层"：</p>
+    <table>
+      <tr><th>闭环环节</th><th>对应九层</th><th>说明</th></tr>
+      <tr><td><strong>输入</strong></td><td>第 1-2 层（接触/浏览）</td><td>信息进入视野，注意力扫过</td></tr>
+      <tr><td><strong>加工</strong></td><td>第 3-5 层（记忆/理解/体系）</td><td>提取练习→记忆，教学输出→理解，精细化编码→体系</td></tr>
+      <tr><td><strong>存储 + 检索</strong></td><td>第 5 层（体系）的支撑</td><td>问法映射让知识网络可检索，是"体系"的外部化</td></tr>
+      <tr><td><strong>应用 + 反馈</strong></td><td>第 6-7 层（应用/思辨）</td><td>在真实问题中调用，通过反馈发现边界</td></tr>
+      <tr><td><strong>淘汰</strong></td><td>第 7-8 层（思辨/创新）的信号</td><td>能识别"这条知识已过时"本身就是思辨能力</td></tr>
+      <tr><td><strong>持续循环</strong></td><td>第 9 层（内化）</td><td>反复循环直到知识成为本能——不需要"想起来用"，而是"自然就会用"</td></tr>
+    </table>
+    <div class="box success"><strong>💡 诊断工具</strong>：选一个你最近学的概念，对照九层阶梯判断它在哪一层，然后对照上表找到对应的闭环环节——那个环节就是你需要加强的下一步。例如：如果你能复述定义（第 3 层）但无法用自己的话讲（第 4 层），你需要加强"加工"环节中的<strong>教学输出</strong>。</div>
+  </div>
+
+  <div class="card">
+    <div class="box primary"><strong>💡 即时行动</strong>检查你现有的知识系统：(1) 你加工后的连接写在了哪里？能找到吗？(2) 你三个月前学的知识，现在能检索到吗？(3) 你有没有标记过"这条知识可能已过时"？如果三个问题的答案都是"不确定"，说明闭环还没建立——先从"问法映射"开始，给每条知识加上"以后我会怎么找它"。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 5  工作流
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--orange),#b8860b)">
+    <span class="sn">5</span> 工作流：日 / 周 / 月 / 季节奏
+  </div>
+  <p class="section-intro">知识加工需要节奏。以下是经过简化的工作流设计——每天只需 15 分钟，关键是持续执行。</p>
+
+  <!-- 每日 -->
+  <div class="wf">
+    <div class="wf-head">
+      <span class="icon">🌅</span>
+      <div>
+        <h4>每日循环：碎片捕获 + 即时加工</h4>
+        <span class="target">⏱ 每日 15 分钟 · 目标：捕获 3-5 个碎片，加工 1-2 个</span>
+      </div>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">晨间 3min</span>
+      <ul><li>快速浏览今日信息源，标记 1-2 个"可能有价值"的碎片</li></ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">日间 碎片化</span>
+      <ul>
+        <li>每遇到有感触的碎片，用 30 秒记录："这让我想起了什么？"</li>
+        <li>如果有机会，立即分享给一个人（触发教学输出）</li>
+      </ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">晚间 10min</span>
+      <ul>
+        <li>回顾今天捕获的碎片，选择<strong>1 个最有价值的</strong></li>
+        <li>用提取练习：合上笔记，默写核心要点</li>
+        <li>用精细化编码：写下"这和我已知的什么有关？"</li>
+        <li>记录到连接日志（见附录模板）</li>
+      </ul>
+    </div>
+    <div class="box success"><strong>💡 关键</strong>：每天的核心指标不是"学了多少"，而是"加工了多少"。宁可只捕获 3 个碎片但每个都加工了，也不要捕获 30 个但全部孤立。</div>
+  </div>
+
+  <!-- 每周 -->
+  <div class="wf">
+    <div class="wf-head">
+      <span class="icon">📊</span>
+      <div>
+        <h4>每周循环：输出 + 复盘</h4>
+        <span class="target">⏱ 每周 1-2 小时（可拆分） · 目标：1 次教学输出 + 1 次问题解决</span>
+      </div>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">周一</span>
+      <ul><li>浏览上周的连接日志，选择<strong>1 个本周连接主题</strong></li></ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">周二-周四</span>
+      <ul>
+        <li>执行 1 次<strong>教学输出</strong>：写一篇"向 XX 解释 Y"的短文（300 字以内）</li>
+        <li>执行 1 次<strong>问题解决</strong>：找一个真实问题，尝试用本周所学解决</li>
+      </ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">周五</span>
+      <ul>
+        <li>本周复盘：哪些碎片产生了连接？哪些还是孤岛？</li>
+        <li>写一段<strong>"本周知识收获"（3 句话以内）</strong></li>
+      </ul>
+    </div>
+    <div class="box success"><strong>💡 关键</strong>：每周必须有至少 1 次输出和 1 次应用。没有输出的学习是假学习。</div>
+  </div>
+
+  <!-- 每月 -->
+  <div class="wf">
+    <div class="wf-head">
+      <span class="icon">🗓️</span>
+      <div>
+        <h4>每月循环：审计 + 调整</h4>
+        <span class="target">⏱ 每月 2-3 小时 · 目标：消除孤立节点 + 调整渠道</span>
+      </div>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">月末</span>
+      <ul>
+        <li>回顾本月的连接日志，画出<strong>"知识网络图"</strong>（手绘或思维导图工具）</li>
+        <li>识别<strong>孤立节点</strong>——只出现一次、没有任何连接的概念</li>
+        <li>为 3 个孤立节点设计"强制连接任务"</li>
+        <li>审计你的输入渠道：哪些在退化？哪些需要新增？</li>
+        <li>写月度复盘："我这月最重要的 1 个认知升级是什么？"</li>
+      </ul>
+    </div>
+    <div class="box success"><strong>💡 关键</strong>：每月的核心是"看见网络"。当你能看到自己的知识结构时，优化就有了方向。</div>
+  </div>
+
+  <!-- 每季 -->
+  <div class="wf">
+    <div class="wf-head">
+      <span class="icon">🚀</span>
+      <div>
+        <h4>每季循环：系统升级</h4>
+        <span class="target">⏱ 每季半天 · 目标：评估系统有效性 + 调整策略</span>
+      </div>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">第 1-2 周</span>
+      <ul>
+        <li>回顾本季度的<strong>质量指标</strong>（见 §6）：哪些在改善？哪些停滞？</li>
+        <li>回顾本季度的<strong>连接日志</strong>：知识网络密度是增加了还是停滞了？</li>
+        <li>识别本季度的<strong>"高密度节点"</strong>——哪些概念被连接最多？它们可能成为你的核心认知框架</li>
+      </ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">第 3 周</span>
+      <ul>
+        <li>执行 1 次<strong>能力迁移实验</strong>：选一个本季度最熟练的概念，应用到一个完全不同的领域</li>
+        <li>执行 1 次<strong>知识淘汰审查</strong>：标记 12 个月以上未被调用的知识条目，决定更新/归档/删除</li>
+        <li>回顾本季度的<strong>错误日志</strong>：有没有重复出现的错误模式？这说明某个知识连接需要修正</li>
+      </ul>
+    </div>
+    <div class="wf-block">
+      <span class="wf-label">第 4 周</span>
+      <ul>
+        <li>升级你的工作流：哪些习惯已内化（不需要提醒就能执行）？哪些需要调整？</li>
+        <li>更新你的<strong>输入渠道清单</strong>：哪些渠道在退化？哪些新渠道值得尝试？</li>
+        <li>写季度复盘：<strong>"我这季度最重要的 1 个认知升级是什么？"</strong>（这篇复盘本身就是一次教学输出）</li>
+        <li>规划下季度的<strong>"连接主题"</strong>——选择 1-2 个你想要深入的领域</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 总览图 -->
+  <div class="card">
+    <h3>四循环联动</h3>
+    <div class="wf-overview">
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--orange),#b8860b)">日</div>
+        <h5>碎片捕获</h5>
+        <p>输入 + 即时加工</p>
+        <span class="time">15 分钟</span>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark))">周</div>
+        <h5>输出 + 复盘</h5>
+        <p>教学 + 问题解决</p>
+        <span class="time">1-2 小时</span>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--green),var(--teal))">月</div>
+        <h5>审计 + 调整</h5>
+        <p>网络图 + 孤岛消除</p>
+        <span class="time">2-3 小时</span>
+      </div>
+      <span class="wf-arrow">→</span>
+      <div class="wf-node">
+        <div class="circle" style="background:linear-gradient(135deg,var(--purple),#9c6644)">季</div>
+        <h5>系统升级</h5>
+        <p>能力迁移 + 策略迭代</p>
+        <span class="time">半天</span>
+      </div>
+    </div>
+    <div class="box primary"><strong>联动逻辑</strong>：每日提供<strong>原材料</strong>（碎片），每周进行<strong>粗加工</strong>（连接实验），每月完成<strong>质检</strong>（网络审计），每季执行<strong>系统升级</strong>（能力迁移）。四个循环不是独立的——每月的审计依赖每日的记录，每季的升级依赖每月的洞察。</div>
+    <div class="box warn"><strong>💡 坚持的秘诀</strong>：从"每日只做 1 件事"开始——每天只写 1 条"这让我想起了什么"。使用<strong>习惯叠加</strong>：把新习惯绑定到已有习惯上（如：每天喝咖啡时写 1 条连接笔记）。不要试图一次性启动整个系统。</div>
+
+    <!-- SVG: Four-cycle workflow -->
+    <svg viewBox="0 0 900 540" role="img" aria-label="日周月季四循环联动图" style="width:100%;margin:24px 0;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border-light)">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#8a8578"/>
+        </marker>
+      </defs>
+      <g font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif">
+        <circle cx="450" cy="270" r="175" fill="none" stroke="#e6e1d6" stroke-width="2"/>
+        <g fill="none" stroke-width="3.5" stroke-linecap="round">
+          <path d="M504.1,103.6 A175,175 0 0 1 616.4,215.9" stroke="#1b4965" marker-end="url(#arrow)"/>
+          <path d="M616.4,324.1 A175,175 0 0 1 504.1,436.4" stroke="#6a4c93" marker-end="url(#arrow)"/>
+          <path d="M395.9,436.4 A175,175 0 0 1 283.6,324.1" stroke="#7b2d43" marker-end="url(#arrow)"/>
+          <path d="M283.6,215.9 A175,175 0 0 1 395.9,103.6" stroke="#2d6a4f" marker-end="url(#arrow)"/>
+        </g>
+        <text x="601" y="116" text-anchor="middle" fill="#1b4965" font-size="14" font-weight="700">原材料</text>
+        <text x="601" y="424" text-anchor="middle" fill="#6a4c93" font-size="14" font-weight="700">粗加工</text>
+        <text x="299" y="424" text-anchor="middle" fill="#7b2d43" font-size="14" font-weight="700">质检</text>
+        <text x="299" y="116" text-anchor="middle" fill="#2d6a4f" font-size="14" font-weight="700">升级</text>
+        <text x="450" y="252" text-anchor="middle" fill="#26241f" font-size="23" font-weight="800">知识操作系统</text>
+        <text x="450" y="282" text-anchor="middle" fill="#6f6a5e" font-size="13.5">碎片 → 连接 → 网络</text>
+        <text x="450" y="306" text-anchor="middle" fill="#6f6a5e" font-size="12.5">每个循环都为下一个循环供料</text>
+        <circle cx="450" cy="95" r="46" fill="#2d6a4f"/>
+        <text x="450" y="107" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">日</text>
+        <text x="450" y="30" text-anchor="middle" fill="#26241f" font-size="15.5" font-weight="700">碎片捕获 + 即时连接</text>
+        <text x="450" y="50" text-anchor="middle" fill="#6f6a5e" font-size="12.5">输入为主 · 15min</text>
+        <circle cx="625" cy="270" r="46" fill="#1b4965"/>
+        <text x="625" y="282" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">周</text>
+        <text x="694" y="262" fill="#26241f" font-size="15.5" font-weight="700">连接实验 + 教学输出</text>
+        <text x="694" y="284" fill="#6f6a5e" font-size="12.5">输出为主 · 1-2h</text>
+        <circle cx="450" cy="445" r="46" fill="#6a4c93"/>
+        <text x="450" y="457" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">月</text>
+        <text x="450" y="510" text-anchor="middle" fill="#26241f" font-size="15.5" font-weight="700">网络审计 + 结构优化</text>
+        <text x="450" y="530" text-anchor="middle" fill="#6f6a5e" font-size="12.5">看见网络 · 2-3h</text>
+        <circle cx="275" cy="270" r="46" fill="#7b2d43"/>
+        <text x="275" y="282" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">季</text>
+        <text x="206" y="262" text-anchor="end" fill="#26241f" font-size="15.5" font-weight="700">系统升级 + 能力迁移</text>
+        <text x="206" y="284" text-anchor="end" fill="#6f6a5e" font-size="12.5">跳出系统 · 半天</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 6  质量评估
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--red),#bc4749)">
+    <span class="sn">6</span> 质量评估：用指标驱动改进
+  </div>
+  <p class="section-intro">没有评估的系统会退化。以下指标基于认知科学研究中的有效测量维度。</p>
+
+  <!-- 核心指标 -->
+  <div class="card">
+    <h3>6.1 核心指标（每月追踪）</h3>
+    <table>
+      <tr><th>指标</th><th>定义</th><th>健康范围</th><th>测量方法</th></tr>
+      <tr>
+        <td><strong>输出/输入比</strong></td>
+        <td>输出时间 ÷ 输入时间</td>
+        <td>≥ 0.5</td>
+        <td>每周记录：输入多少小时？输出多少小时？</td>
+      </tr>
+      <tr>
+        <td><strong>连接率</strong></td>
+        <td>有连接的碎片 ÷ 总碎片数</td>
+        <td>≥ 60%</td>
+        <td>每月统计连接日志</td>
+      </tr>
+      <tr>
+        <td><strong>提取练习频率</strong></td>
+        <td>每周进行提取练习的次数</td>
+        <td>≥ 3 次/周</td>
+        <td>记录每次合上书复述的次数</td>
+      </tr>
+      <tr>
+        <td><strong>教学输出次数</strong></td>
+        <td>每周进行教学输出的次数</td>
+        <td>≥ 1 次/周</td>
+        <td>记录写解释文、讲给别人听的次数</td>
+      </tr>
+      <tr>
+        <td><strong>孤立节点数</strong></td>
+        <td>没有任何连接的碎片数量</td>
+        <td>≤ 5 个/月</td>
+        <td>每月网络图审计</td>
+      </tr>
+      <tr>
+        <td><strong>错误记录数</strong></td>
+        <td>有结构化复盘的错误数量</td>
+        <td>≥ 1 个/月</td>
+        <td>记录"假设→偏差→教训"的复盘数量</td>
+      </tr>
+    </table>
+    <div class="box warn"><strong>📌 关于数字</strong>以上"健康范围"是基于研究中的有效干预水平设定的合理估计，不是精确阈值。例如"输出/输入比 ≥ 0.5"对应 Dunlosky 等人（2013） <a href="https://scholar.google.com/scholar?q=Dunlosky+2013+effective+learning+techniques" target="_blank" style="color:var(--primary);font-size:.82rem;font-weight:600" title="在 Google Scholar 查看原文">[📄]</a>推荐的"练习与输入时间比至少 1:2"。这些数字应根据你的实际情况调整。</div>
+  </div>
+
+  <!-- 每周自评 -->
+  <div class="card">
+    <h3>6.2 每周自评清单</h3>
+    <p>每周花 5 分钟诚实回答以下问题（点击勾选）：</p>
+    <div class="checklist" id="checklist">
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">本周我能用自己的话说出<strong>至少 1 个新概念的核心定义</strong></div>
+        <span class="cl-score">基础</span>
+      </div>
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">我能为这个概念举出<strong>1 个生活中的具体例子</strong>（不是书本上的）</div>
+        <span class="cl-score">+1</span>
+      </div>
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">我本周<strong>至少 1 次向他人解释</strong>了某个概念</div>
+        <span class="cl-score">+2</span>
+      </div>
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">我本周<strong>至少 1 次用新知识解决了实际问题</strong></div>
+        <span class="cl-score">+2</span>
+      </div>
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">我记录了<strong>至少 1 次错误或失败</strong>并分析了原因</div>
+        <span class="cl-score">+1</span>
+      </div>
+      <div class="cl-item" onclick="toggleCheck(this)">
+        <div class="cl-box"></div>
+        <div class="cl-text">我的输出/输入比是否合理？（输出 ≥ 输入的一半）</div>
+        <span class="cl-score">+1</span>
+      </div>
+    </div>
+    <div class="score-display">
+      <div class="big" id="scoreNum">0 / 6</div>
+      <div class="label" id="scoreLabel">点击上方项目进行自评</div>
+    </div>
+  </div>
+
+  <!-- 诊断 -->
+  <div class="card">
+    <h3>6.3 常见问题诊断</h3>
+    <div class="ts-grid">
+      <div class="ts">
+        <div class="symptom">😵 "学了就忘"</div>
+        <div class="cause"><strong>根因：</strong>输入过多，提取练习不足</div>
+        <div class="fix"><strong>修复：</strong>执行"24 小时规则"——每学一个概念，24 小时内必须提取一次</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">🤯 "碎片太多，overwhelm"</div>
+        <div class="cause"><strong>根因：</strong>输入渠道超过处理能力</div>
+        <div class="fix"><strong>修复：</strong>将每日渠道限制在 3-5 个，坚持 1 个月</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">😴 "感觉没有真正理解"</div>
+        <div class="cause"><strong>根因：</strong>缺乏教学输出和问题解决</div>
+        <div class="fix"><strong>修复：</strong>每周至少 1 次"向 XX 解释 Y"写作</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">🔄 "无法迁移到新领域"</div>
+        <div class="cause"><strong>根因：</strong>精细化编码不足</div>
+        <div class="fix"><strong>修复：</strong>每个概念至少建立 1 个跨领域类比</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">⏰ "坚持不下去"</div>
+        <div class="cause"><strong>根因：</strong>系统太复杂</div>
+        <div class="fix"><strong>修复：</strong>从"每天只写 1 条连接笔记"开始</div>
+      </div>
+      <div class="ts">
+        <div class="symptom">🎯 "什么都学但都不深"</div>
+        <div class="cause"><strong>根因：</strong>缺乏主题聚焦</div>
+        <div class="fix"><strong>修复：</strong>每周设定 1 个"连接主题"，所有碎片围绕这个主题</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     § 7  附录
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-head" style="background:linear-gradient(135deg,var(--brown),#8b6914)">
+    <span class="sn">A</span> 附录：工具、模板与参考文献
+  </div>
+
+  <!-- 工具 -->
+  <div class="card">
+    <h3>A.1 推荐工具</h3>
+    <table>
+      <tr><th>用途</th><th>推荐</th><th>选择理由</th><th>替代方案</th></tr>
+      <tr><td><strong>碎片速记</strong></td><td>Flomo / 备忘录</td><td>极简输入，无排版干扰</td><td>Apple 备忘录、Google Keep</td></tr>
+      <tr><td><strong>知识网络</strong></td><td>Obsidian / Logseq</td><td>双向链接，图谱视图，本地存储</td><td>Heptabase、Roam Research</td></tr>
+      <tr><td><strong>语音捕获</strong></td><td>讯飞语记 / 系统语音</td><td>走路时记录灵感</td><td>Otter、微信语音转文字</td></tr>
+      <tr><td><strong>习惯追踪</strong></td><td>Streaks / 滴答清单</td><td>可视化连续天数</td><td>Habitica、纸质打卡表</td></tr>
+      <tr><td><strong>思维导图</strong></td><td>XMind / 手绘</td><td>快速绘制知识网络图</td><td>Excalidraw、MindNode</td></tr>
+    </table>
+    <div class="box warn"><strong>⚠️ 工具极简原则</strong>不要同时使用超过 3 个笔记工具。工具越多，连接越分散。选择 1 个主力工具，其他只作为输入端。</div>
+  </div>
+
+  <!-- 快速启动 -->
+  <div class="card">
+    <h3>A.2 快速启动</h3>
+    <div class="sc-grid">
+      <div class="sc" style="border-top-color:var(--green)">
+        <h4>🏃 5 分钟极速版</h4>
+        <ul>
+          <li>打开备忘录，标题写<strong>"今天的一个连接"</strong></li>
+          <li>回想今天学到的任何一个概念</li>
+          <li>写下："这个概念让我想起了____，因为____"</li>
+          <li><strong>保存。完成。</strong></li>
+        </ul>
+      </div>
+      <div class="sc" style="border-top-color:var(--primary)">
+        <h4>🚀 30 分钟完整版</h4>
+        <ul>
+          <li>选择 <strong>1 个本周主题</strong></li>
+          <li>选定 <strong>3 个每日渠道</strong></li>
+          <li>设置 <strong>1 个每日提醒</strong></li>
+          <li>写第一篇<strong>"向 XX 解释 Y"</strong></li>
+          <li>找 <strong>1 个应用场景</strong></li>
+        </ul>
+      </div>
+      <div class="sc" style="border-top-color:var(--purple)">
+        <h4>🎯 周末深度版</h4>
+        <ul>
+          <li>安装主力笔记工具</li>
+          <li>选出 <strong>10 个最适合你的渠道</strong></li>
+          <li>设计每日/每周/每月模板</li>
+          <li>找 1 个<strong>知识伙伴</strong></li>
+          <li>写一份<strong>"知识操作系统宣言"</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 连接日志模板 -->
+  <div class="card">
+    <h3>A.3 连接日志模板（可复制使用）</h3>
+    <button class="copybtn" data-copy="logTemplate">📋 复制</button>
+<pre id="logTemplate">
+【日期】2026-08-01
+【今日主题】价格心理学
+
+--- 碎片捕获 ---
+1. [播客] "价格锚定"——人们倾向于用第一个看到的价格作为参考
+2. [对话] 同事说"这个供应商报价太高了"——锚定效应在谈判中的体现
+
+--- 连接建立 ---
+碎片1 → 碎片2：锚定效应不仅存在于消费者决策，也存在于采购谈判中
+碎片1 → 个人经验：上周采购中没有提前设定预算锚点，导致谈判被动
+
+--- 加工记录 ---
+[提取练习] 合上笔记复述了"价格锚定"的定义和机制 ✓
+[问题解决] 买菜时刻意使用锚定策略——先问高价再砍价，省了 8 块 ✓
+[教学输出] 尝试向家人解释"锚定效应"，发现说不清，回去重读了定义 ✓
+
+--- 今日总结 ---
+碎片数：2 | 连接数：2 | 加工事件：3
+</pre>
+  </div>
+
+  <!-- 参考文献 -->
+  <div class="card">
+    <h3>A.4 参考文献</h3>
+    <p class="muted">每条引用均附 Google Scholar 搜索链接——点击即可查找论文全文或 PDF。学术论文通常可通过 Scholar 找到免费版本。</p>
+    <ol class="ref-list">
+      <li><strong>Tulving, E., & Thomson, D. M.</strong> (1973). Encoding specificity and retrieval processes in episodic memory. <em>Psychological Review</em>, 80(5), 352–373. <a href="https://scholar.google.com/scholar?q=Tulving+Thomson+1973+encoding+specificity" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Roediger, H. L., & Karpicke, J. D.</strong> (2006). Test-enhanced learning. <em>Psychological Science</em>, 17(3), 249–255. <a href="https://scholar.google.com/scholar?q=Roediger+Karpicke+2006+test+enhanced+learning" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Cepeda, N. J., et al.</strong> (2006). Distributed practice in verbal recall tasks. <em>Psychological Bulletin</em>, 132(3), 354–380. <a href="https://scholar.google.com/scholar?q=Cepeda+2006+distributed+practice+verbal+recall" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Craik, F. I. M., & Lockhart, R. S.</strong> (1972). Levels of processing. <em>Journal of Verbal Learning and Verbal Behavior</em>, 11(6), 671–684. <a href="https://scholar.google.com/scholar?q=Craik+Lockhart+1972+levels+of+processing" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Craik, F. I. M., & Tulving, E.</strong> (1975). Depth of processing and the retention of words. <em>Journal of Experimental Psychology: General</em>, 104(3), 268–294. <a href="https://scholar.google.com/scholar?q=Craik+Tulving+1975+depth+of+processing" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Slamecka, N. J., & Graf, P.</strong> (1978). The generation effect. <em>Journal of Experimental Psychology: Human Learning and Memory</em>, 4(6), 592–604. <a href="https://scholar.google.com/scholar?q=Slamecka+Graf+1978+generation+effect" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>McGaugh, J. L.</strong> (2004). The amygdala modulates the consolidation of memories. <em>Annual Review of Neuroscience</em>, 27, 1–28. <a href="https://scholar.google.com/scholar?q=McGaugh+2004+amygdala+consolidation+memories" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Walker, M. P., & Stickgold, R.</strong> (2006). Sleep, memory, and plasticity. <em>Annual Review of Psychology</em>, 57, 139–166. <a href="https://scholar.google.com/scholar?q=Walker+Stickgold+2006+sleep+memory+plasticity" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Diekelmann, S., & Born, J.</strong> (2010). The memory function of sleep. <em>Nature Reviews Neuroscience</em>, 11(2), 114–126. <a href="https://scholar.google.com/scholar?q=Diekelmann+Born+2010+memory+function+sleep" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Rohrer, D., & Taylor, K.</strong> (2007). The shuffling of mathematics problems improves learning. <em>Instructional Science</em>, 35(6), 481–498. <a href="https://scholar.google.com/scholar?q=Rohrer+Taylor+2007+shuffling+mathematics+problems" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Kornell, N., & Bjork, R. A.</strong> (2008). Learning concepts and categories. <em>Psychological Science</em>, 19(6), 585–592. <a href="https://scholar.google.com/scholar?q=Kornell+Bjork+2008+learning+concepts+categories" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Fiorella, L., & Mayer, R. E.</strong> (2015). <em>Learning as a Generative Activity</em>. Cambridge University Press. <a href="https://scholar.google.com/scholar?q=Fiorella+Mayer+2015+learning+generative+activity" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Collins, A., Brown, J. S., & Newman, S. E.</strong> (1989). Cognitive apprenticeship. In L. B. Resnick (Ed.), <em>Knowing, Learning, and Instruction</em>. <a href="https://scholar.google.com/scholar?q=Collins+Brown+Newman+1989+cognitive+apprenticeship" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Lave, J., & Wenger, E.</strong> (1991). <em>Situated Learning</em>. Cambridge University Press. <a href="https://scholar.google.com/scholar?q=Lave+Wenger+1991+situated+learning" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Ebbinghaus, H.</strong> (1885). <em>Über das Gedächtnis</em>. Duncker & Humblot. <a href="https://scholar.google.com/scholar?q=Ebbinghaus+1885+Gedächtnis+forgetting+curve" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Rowland, C. A.</strong> (2014). The effect of testing versus restudy on retention. <em>Psychological Bulletin</em>, 140(6), 1432–1463. <a href="https://scholar.google.com/scholar?q=Rowland+2014+testing+effect+meta+analysis" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Dunlosky, J., et al.</strong> (2013). Improving students' learning with effective learning techniques. <em>Psychological Science in the Public Interest</em>, 14(1), 4–58. <a href="https://scholar.google.com/scholar?q=Dunlosky+2013+effective+learning+techniques" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Godden, D. R., & Baddeley, A. D.</strong> (1975). Context-dependent memory in two natural environments. <em>British Journal of Psychology</em>, 66(3), 325–331. <a href="https://scholar.google.com/scholar?q=Godden+Baddeley+1975+context+dependent+memory" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Talarico, J. M., & Rubin, D. C.</strong> (2003). Confidence, not consistency, characterizes flashbulb memories. <em>Psychological Science</em>, 14(5), 455–461. <a href="https://scholar.google.com/scholar?q=Talarico+Rubin+2003+flashbulb+memories+confidence" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Bertsch, S., et al.</strong> (2007). The generation effect: A meta-analytic review. <em>Memory & Cognition</em>, 35(2), 201–210. <a href="https://scholar.google.com/scholar?q=Bertsch+2007+generation+effect+meta+analysis" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Festinger, L.</strong> (1957). <em>A Theory of Cognitive Dissonance</em>. Stanford University Press. <a href="https://scholar.google.com/scholar?q=Festinger+1957+cognitive+dissonance" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Wixted, J. T.</strong> (2004). The psychology and neuroscience of forgetting. <em>Annual Review of Psychology</em>, 55, 235–269. <a href="https://scholar.google.com/scholar?q=Wixted+2004+psychology+neuroscience+forgetting" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Brown, R., & Kulik, J.</strong> (1977). Flashbulb memories. <em>Cognition</em>, 5(1), 73–99. <a href="https://scholar.google.com/scholar?q=Brown+Kulik+1977+flashbulb+memories" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Anderson, L. W., & Krathwohl, D. R.</strong> (Eds.). (2001). <em>A Taxonomy for Learning, Teaching, and Assessing</em>. Longman. <a href="https://scholar.google.com/scholar?q=Anderson+Krathwohl+2001+taxonomy+learning+teaching" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Rowley, J.</strong> (2007). The wisdom hierarchy: Representations of the DIKW hierarchy. <em>Journal of Information Science</em>, 33(2), 163–180. <a href="https://scholar.google.com/scholar?q=Rowley+2007+wisdom+hierarchy+DIKW" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Ericsson, K. A., Krampe, R. T., & Tesch-Römer, C.</strong> (1993). The role of deliberate practice in the acquisition of expert performance. <em>Psychological Review</em>, 100(3), 363–406. <a href="https://scholar.google.com/scholar?q=Ericsson+Krampe+1993+deliberate+practice+expert+performance" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Kolb, D. A.</strong> (1984). <em>Experiential Learning</em>. Prentice-Hall. <a href="https://scholar.google.com/scholar?q=Kolb+1984+experiential+learning" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Anderson, J. R.</strong> (1990). <em>The Adaptive Character of Thought</em>. Erlbaum. <a href="https://scholar.google.com/scholar?q=Anderson+1990+adaptive+character+thought" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Hutchins, E.</strong> (1995). <em>Cognition in the Wild</em>. MIT Press. <a href="https://scholar.google.com/scholar?q=Hutchins+1995+cognition+in+the+wild" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Kirsh, D., & Maglio, P.</strong> (1994). On distinguishing epistemic from pragmatic action. <em>Cognitive Science</em>, 18(4), 513–549. <a href="https://scholar.google.com/scholar?q=Kirsh+Maglio+1994+epistemic+pragmatic+action" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Anderson, J. R., & Lebiere, C.</strong> (1998). <em>The Atomic Components of Thought</em>. Erlbaum. <a href="https://scholar.google.com/scholar?q=Anderson+Lebiere+1998+atomic+components+thought" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Piaget, J.</strong> (1985). <em>The Equilibration of Cognitive Structures</em>. University of Chicago Press. <a href="https://scholar.google.com/scholar?q=Piaget+1985+equilibration+cognitive+structures" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Sweller, J.</strong> (1988). Cognitive load during problem solving. <em>Cognitive Science</em>, 12(2), 257–285. <a href="https://scholar.google.com/scholar?q=Sweller+1988+cognitive+load+problem+solving" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Flavell, J. H.</strong> (1979). Metacognition and cognitive monitoring. <em>American Psychologist</em>, 34(10), 906–911. <a href="https://scholar.google.com/scholar?q=Flavell+1979+metacognition+cognitive+monitoring" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Vygotsky, L. S.</strong> (1978). <em>Mind in Society</em>. Harvard University Press. <a href="https://scholar.google.com/scholar?q=Vygotsky+1978+mind+in+society" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Wolf, M.</strong> (2018). <em>Reader, Come Home</em>. Harper. <a href="https://scholar.google.com/scholar?q=Maryanne+Wolf+2018+reader+come+home" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Alter, A.</strong> (2017). <em>Irresistible</em>. Penguin. <a href="https://scholar.google.com/scholar?q=Adam+Alter+2017+irresistible+addictive+technology" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Ward, A. F., Duke, K., Gneezy, A., & Bos, M. W.</strong> (2017). Brain drain: The mere presence of one's own smartphone reduces available cognitive capacity. <em>J. of the Association for Consumer Research</em>, 2(2), 140–154. <a href="https://scholar.google.com/scholar?q=Ward+Duke+2017+brain+drain+smartphone+cognitive+capacity" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Twenge, J. M., & Campbell, W. K.</strong> (2018). Associations between screen time and lower psychological well-being. <em>Preventive Medicine Reports</em>, 12, 271–283. <a href="https://scholar.google.com/scholar?q=Twenge+Campbell+2018+screen+time+psychological+well+being" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Stothart, C., Mitchum, A., & Yehnert, C.</strong> (2015). The attentional cost of receiving a cell phone notification. <em>J. of Experimental Psychology: HPP</em>, 41(4), 893–897. <a href="https://scholar.google.com/scholar?q=Stothart+Mitchum+2015+attentional+cost+cell+phone+notification" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Leroy, S.</strong> (2009). Why is it so hard to do my work? <em>Organizational Behavior and Human Decision Processes</em>, 109(2), 168–181. <a href="https://scholar.google.com/scholar?q=Leroy+2009+attention+residue+switching+tasks" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Zuboff, S.</strong> (2019). <em>The Age of Surveillance Capitalism</em>. PublicAffairs. <a href="https://scholar.google.com/scholar?q=Zuboff+2019+surveillance+capitalism" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Kellogg, R. T.</strong> (2008). Training advanced writing skills. <em>Educational Psychologist</em>, 43(3), 145–159. <a href="https://scholar.google.com/scholar?q=Kellogg+2008+training+advanced+writing+skills+deliberate+practice" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Feldon, D. F., & Kafai, Y. B.</strong> (2019). Audio learning. In <em>Instructional Design</em>. <a href="https://scholar.google.com/scholar?q=Feldon+Kafai+2019+audio+learning+cognitive+load" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Harris, T.</strong> (2016). How technology hijacks people's minds. <a href="https://scholar.google.com/scholar?q=Tristan+Harris+2016+technology+hijacks+attention" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Stone, L.</strong> (2009). Continuous partial attention. <a href="https://scholar.google.com/scholar?q=Linda+Stone+continuous+partial+attention" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+      <li><strong>Lin, L., et al.</strong> (2016). Social networking and psychological well-being. <a href="https://scholar.google.com/scholar?q=Lin+2016+social+media+social+comparison+self+efficacy" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Scholar</a></li>
+    </ol>
+  </div>
+
+  <!-- 相关页面快捷导航 -->
+  <div class="card" style="margin-top:24px;border-left:4px solid #C89F65">
+    <h3>🔗 相关页面</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px">
+      <a href="/metacognition/nine-layer-model/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">🪜</span>
+        <div><div style="font-weight:700;font-size:14px">九重知识阶梯</div><div style="font-size:12px;color:var(--muted)">从翻书到内化的九层路径</div></div>
+      </a>
+      <a href="/models/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">🧠</span>
+        <div><div style="font-weight:700;font-size:14px">100 个思维模型</div><div style="font-size:12px;color:var(--muted)">完整的认知工具箱</div></div>
+      </a>
+      <a href="/models/056-费曼技巧/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">🎓</span>
+        <div><div style="font-weight:700;font-size:14px">费曼技巧</div><div style="font-size:12px;color:var(--muted)">教学输出的核心方法</div></div>
+      </a>
+      <a href="/models/070-遗忘曲线/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">📉</span>
+        <div><div style="font-weight:700;font-size:14px">遗忘曲线</div><div style="font-size:12px;color:var(--muted)">提取练习的科学基础</div></div>
+      </a>
+      <a href="/models/067-元认知/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">🪞</span>
+        <div><div style="font-weight:700;font-size:14px">元认知</div><div style="font-size:12px;color:var(--muted)">对自己思考过程的思考</div></div>
+      </a>
+      <a href="/human/site-structure/" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--primary);transition:border-color .2s">
+        <span style="font-size:20px">✍️</span>
+        <div><div style="font-weight:700;font-size:14px">网站结构</div><div style="font-size:12px;color:var(--muted)">五大栏目介绍</div></div>
+      </a>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Footer
+     ═══════════════════════════════════════════════════════════ -->
+<footer>
+  <p class="ft-main">知识操作系统 · 认知科学版 · 基于 47 篇核心研究文献构建</p>
+  <p class="ft-sub">每一个建议都有研究依据 · 每一个指标都可以实际测量</p>
+</footer>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     Interactive Script
+     ═══════════════════════════════════════════════════════════ -->
+<button class="top-btn" id="topBtn" title="回到顶部">↑</button>
+
+<script>
+/* ── 1. Reading progress + back to top ── */
+var prog=document.getElementById('progress'),topBtn=document.getElementById('topBtn');
+window.addEventListener('scroll',function(){
+  var h=document.documentElement,p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+  prog.style.width=p+'%';
+  topBtn.classList.toggle('show',h.scrollTop>600);
+});
+topBtn.onclick=function(){window.scrollTo({top:0,behavior:'smooth'})};
+
+/* ── 2. Navigation highlight ── */
+var navLinks=document.querySelectorAll('#navlinks a'),secs=document.querySelectorAll('section[id]');
+var obs=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){
+      navLinks.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id)});
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+secs.forEach(function(s){obs.observe(s)});
+
+/* ── 3. Checklist with localStorage ── */
+var CK_KEY='kos-mimo-checklist';
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  el.querySelector('.cl-box').classList.toggle('checked');
+  updateScore();
+  saveChecklist();
+}
+function updateScore(){
+  var items=document.querySelectorAll('#checklist .cl-item');
+  var checked=document.querySelectorAll('#checklist .cl-item.checked').length;
+  var total=items.length;
+  document.getElementById('scoreNum').textContent=checked+' / '+total;
+  var label=document.getElementById('scoreLabel');
+  if(checked<=2)label.textContent='需要增加输出和应用';
+  else if(checked<=4)label.textContent='不错的节奏，继续坚持';
+  else label.textContent='优秀的知识加工习惯！';
+}
+function saveChecklist(){
+  var state=[];
+  document.querySelectorAll('#checklist .cl-item').forEach(function(c,i){
+    if(c.classList.contains('checked'))state.push(i);
+  });
+  try{localStorage.setItem(CK_KEY,JSON.stringify({d:new Date().toISOString().slice(0,10),v:state}))}catch(e){}
+}
+function loadChecklist(){
+  try{
+    var raw=JSON.parse(localStorage.getItem(CK_KEY)||'null');
+    if(raw&&raw.v){
+      var items=document.querySelectorAll('#checklist .cl-item');
+      raw.v.forEach(function(i){if(items[i]){items[i].classList.add('checked');items[i].querySelector('.cl-box').classList.add('checked')}});
+      updateScore();
+    }
+  }catch(e){}
+}
+loadChecklist();
+
+/* ── 4. Channel search + filter ── */
+var searchInput=document.getElementById('chSearch'),
+    chips=document.querySelectorAll('#chChips .chip'),
+    chBlocks=document.querySelectorAll('.ch-cat'),
+    countEl=document.getElementById('chCount'),
+    activeCat='all';
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function applyFilter(){
+  var q=(searchInput.value||'').trim().toLowerCase(),visible=0,
+      re=q?new RegExp('('+escRe(searchInput.value.trim())+')','gi'):null;
+  chBlocks.forEach(function(b){
+    var catOk=(activeCat==='all'||b.dataset.cat===activeCat),any=false;
+    b.querySelectorAll('.ch').forEach(function(t){
+      var txt=t.textContent.toLowerCase(),ok=catOk&&(!q||txt.indexOf(q)>-1);
+      t.style.display=ok?'':'none';if(ok){any=true;visible++;}
+      t.querySelectorAll('h5,p').forEach(function(el){
+        if(!el.dataset.orig)el.dataset.orig=el.innerHTML;
+        el.innerHTML=(re&&ok)?el.dataset.orig.replace(re,'<mark>$1</mark>'):el.dataset.orig;
+      });
+    });
+    b.style.display=any?'':'none';
+  });
+  countEl.textContent='共 '+visible+' 条'+(q?'（搜索："'+searchInput.value.trim()+'"）':'');
+}
+if(searchInput){
+  searchInput.addEventListener('input',applyFilter);
+  chips.forEach(function(c){
+    c.onclick=function(){
+      chips.forEach(function(x){x.classList.remove('on')});
+      c.classList.add('on');activeCat=c.dataset.cat;applyFilter();
+    };
+  });
+}
+
+/* ── 5. Template copy ── */
+document.querySelectorAll('.copybtn').forEach(function(btn){
+  btn.onclick=function(){
+    var txt=document.getElementById(btn.dataset.copy).textContent;
+    function done(){btn.textContent='✅ 已复制';setTimeout(function(){btn.textContent='📋 复制'},1800)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done,function(){fallback()});
+    }else{fallback()}
+    function fallback(){
+      var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);
+      ta.select();document.execCommand('copy');document.body.removeChild(ta);done();
+    }
+  };
+});
+</script>
+</body>
+</html>

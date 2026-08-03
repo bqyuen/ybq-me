@@ -1,6 +1,7 @@
 ---
-title: "思维模型星图"
+title: "🌌 思维模型星图"
 layout: "single"
+weight: -1
 description: "100 个思维模型 · 10 大分类 · 353 组关联 —— 一张可以探索的知识星图"
 ---
 
