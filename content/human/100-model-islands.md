@@ -57,4 +57,4 @@ AI 跑完之后给了我一堆数字。我一看，有些在意料之中，有�
 
 ---
 
-*这是第三篇。前两篇：[为什么我开始写这个网站](/human/first-post/) · [网站的结构](/human/site-structure/)*
+*这是第三篇。前两篇：[为什么我开始写这个网站](/human/first-post/) · [网站的结构](/human/site-structure/) · [下一篇：5000 个笔记吃灰之后](/human/ai-changed-learning/)*
