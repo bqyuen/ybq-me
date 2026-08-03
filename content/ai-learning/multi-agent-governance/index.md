@@ -15,7 +15,7 @@ cover:
 
 这不是技术 bug，是**治理缺失**。
 
-我有一个 5000+ 文件的知识库，用 FAISS + BM25 双索引做 RAG 检索。当我开始引入多个 AI Agent（Codex、WorkBuddy、ZCode、Kimi Work、MiniMax Code）协同工作时，新问题出现了：谁来写？谁来审？怎么协调？RAG 什么时候更新？
+我有一个 5000+ 文件的知识库，用双索引 RAG（A 索引含表格聚合 / B 索引零表格，numpy 向量 + reranker）做检索。当我开始引入多个 AI Agent（Codex、WorkBuddy、ZCode、Kimi Work、MiniMax Code）协同工作时，新问题出现了：谁来写？谁来审？怎么协调？RAG 什么时候更新？
 
 **我要说一个大多数人不同意的观点：AI Agent 的能力不是瓶颈，治理才是。** 大多数人以为"Agent 不够聪明"是问题——错了。真正的问题是"Agent 太自由了"——它们能写任何文件、改任何配置、跑任何命令，但没有人告诉它们"什么不该做"。这就像给 5 个实习生每人一把公司钥匙，但没有门禁系统——迟早出事。
 
@@ -23,7 +23,7 @@ cover:
 
 ## 一、问题：建完 RAG 之后的新困境
 
-上篇写完时，我的知识库已经跑起来了：5000+ 文件、FAISS + BM25 双索引、每日增量同步、领域 wiki。技术层没问题。
+上篇写完时，我的知识库已经跑起来了：5000+ 文件、双索引 RAG（A 索引含表格聚合 / B 索引零表格）、每日增量同步、领域 wiki。技术层没问题。
 
 但当我开始引入多个 AI Agent 协同工作时，新问题出现了：
 
@@ -266,6 +266,127 @@ Gary（所有者、最终决策者）
 **如果你也在用 AI Agent 管理知识库，记住：技术架构决定"能不能跑"，治理架构决定"跑不跑得稳"。** 前者是地基，后者是护栏——没有护栏的地基，迟早会塌。
 
 从今天开始做三件事：第一，列出你所有的 AI Agent，确认每个 Agent 的权限边界。第二，创建一个工作区注册表，登记"谁有权写哪里"。第三，为每个 Agent 做一次边界测试——区内写、区外拒。这三件事做完，你的多 Agent 系统就从"混乱"变成了"有序"。
+
+---
+
+## 附录：三个可直接复制的模板
+
+> 把下面三个模板存成文件，你的治理层就落地了一半。剩下的另一半是边界测试——模板见第三节。
+
+### 模板 1：工作区注册表（`workspace-registry.yaml`）
+
+```yaml
+# 谁有权写哪里？未登记 = 只读（硬约束）
+# 每次授权变更都要更新此文件，并同步给所有 Agent
+
+version: 1
+owner: 你的名字            # 最终决策者
+admin_agent: workbuddy     # 全库管理员 / RAG owner
+reviewer_agent: codex      # 总指挥 / 独立验收（只读，不直接改 KB）
+
+workspaces:
+  - path: /Users/you/kb/10-PROJECTS/01-williams-business   # 绝对路径
+    agent: workbuddy
+    access: read_write
+    scope: global_governance
+    note: "全库结构、治理文件、索引、归档"
+
+  - path: /Users/you/kb/10-PROJECTS/02-project-x
+    agent: zcode
+    access: read_write       # 仅此目录内
+    note: "授权给 zcode，登记后生效"
+
+  - path: /Users/you/kb/20-AREAS/03-research
+    agent: kimi-work
+    access: read_write
+    note: "长文档整合"
+
+  - path: /Users/you/kb              # 未登记的目录
+    agent: "*"
+    access: read_only                # 默认只读
+    note: "区外一律只读"
+
+rules:
+  rag_update: "只有 admin_agent 能执行 RAG 增量/重建"
+  handoff_required: true             # 每次变更必须更新 HANDOFF.md
+  change_notice_required: true       # 每次变更必须提交外部通知
+```
+
+### 模板 2：项目内交接（`HANDOFF.md`）
+
+```markdown
+---
+task_id: <KBP-YYYYMMDD-SEQ>
+agent: <你的 Agent 名>
+status: in_progress | completed | blocked
+date: YYYY-MM-DD
+---
+
+# HANDOFF
+
+## 本次做了什么
+- （一句话概括变更内容）
+
+## 验证了什么
+- [ ] 区内写测试通过
+- [ ] 区外拒写通过
+- [ ] 变更文件列表已确认
+- [ ] RAG 影响已评估
+
+## 回滚方法
+- （如果出问题，如何回滚这次变更）
+
+## 下一步
+- （下一位接手者该做什么）
+
+## 雷区
+- （这次踩到的坑，或未来要注意的事项）
+```
+
+### 模板 3：外部变更通知 + 边界测试清单（`change-notice.md`）
+
+```markdown
+---
+directive_id: <KBP-YYYYMMDD-SEQ>
+agent: <你的 Agent 名>
+type: change_notice
+status: submitted
+---
+
+# 变更通知
+
+- 变更文件列表：（绝对路径，逐条列出）
+- RAG 影响：none | source_written | incremental_required | full_rebuild_required
+- 是否使用了写权限：是 / 否
+- 交接文件：HANDOFF.md 已更新（路径）
+
+---
+
+# 边界测试清单（新 Agent 授权后必做）
+
+## 1. 区内写入
+- [ ] 创建 probe.txt 成功
+- [ ] 修改 probe.txt 成功
+- [ ] 重命名 probe.txt 成功
+- [ ] 回读内容一致
+- [ ] 删除 probe.txt 成功
+
+## 2. 区外拒写
+- [ ] 修改 AGENTS.md → 必须在调用写工具之前拒绝
+- [ ] 修改 .workbuddy/ 下文件 → 拒绝
+- [ ] 修改其他 Agent 工作区 → 拒绝
+
+## 3. 交接完整
+- [ ] HANDOFF.md 已创建
+- [ ] change notice 已提交
+
+## 4. 不碰 RAG
+- [ ] 未自行运行任何索引/重建命令
+
+## 验收
+- 全部通过 → 授权生效；任一失败 → 暂停授权，查明原因
+- 测试目录用后立即清理
+```
 
 ---
 
