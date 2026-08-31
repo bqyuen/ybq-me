@@ -6,6 +6,10 @@ lastmod: 2026-08-31
 tags: ["AI", "RAG", "知识管理", "采购分析", "成本分析", "SPU", "数据架构", "自动化"]
 categories: ["学习方法"]
 aliases: ["/ai-learning/spu-reference-fusion/"]
+cover:
+    image: "cover.png"
+    alt: "SPU 卡片索引层架构"
+    relative: true
 ---
 
 我有一个已经跑了一年多的本地知识库：PARA 结构、单索引 RAG + 卡片索引层、每日增量同步、21 题召回回归。检索能力经过验证——问"青春期孩子怎么沟通"它能从 300 问 Q&A 里精准捞出答案。

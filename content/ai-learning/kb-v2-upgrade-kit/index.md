@@ -6,6 +6,10 @@ lastmod: 2026-08-31
 tags: ["AI", "RAG", "知识管理", "Obsidian", "SPU", "数据架构", "自动化", "知识库"]
 categories: ["学习方法"]
 aliases: ["/ai-learning/kb-v2-upgrade-kit/"]
+cover:
+    image: "cover.png"
+    alt: "知识库 2.0 四层架构升级"
+    relative: true
 ---
 
 这是"本地 AI 知识库实践"系列的第四篇。前面三篇分别讲了：怎么搭（[v1 搭建](/ai-learning/local-ai-knowledgebase/)）、怎么更聪明（v2 多跳检索 + 看板）、怎么让数字可信（[知识库 2.0 卡片索引](/ai-learning/spu-reference-fusion/)）。
