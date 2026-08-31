@@ -51,3 +51,6 @@ worker/generate_cases.js
 worker/case_pool*.json
 worker/kv_upload*.json
 worker/node_modules/
+
+# git 备份目录（不入库）
+.git.bak.*/

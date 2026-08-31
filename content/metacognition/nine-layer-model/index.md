@@ -7,10 +7,31 @@ categories: ["元认知", "认知阶梯"]
 weight: 30
 showToc: true
 TocOpen: true
+cover:
+  image: "cover.png"
+  relative: true
 ---
 
 > **类型**：多理论整合的结构化分析 · 认知阶梯模型
 > **关联**：[知识操作系统](/learning/knowledge-os/)（方法论落地）| 布鲁姆分类法 | DIKW 模型 | [费曼技巧](/models/056-费曼技巧/)
+
+---
+
+## 系列导航：《九重知识体系》实操篇
+
+> 本文是**总览**。每层都有**独立实操篇**（含动作包、7 天清单、读者行动卡、Q&A）——按你的卡点直接进对应篇目：
+
+| 层级 | 实操篇 | 核心问题 |
+|:---:|--------|---------|
+| 1-3 接触/浏览/记忆 | [入门篇 · 从「看过」到「记住」](/metacognition/nine-layer/01-receive/) | 为什么 99% 的"学过"只停留在前两层 |
+| 4 理解 | [第 4 层 · 从「能复述」到「能讲」](/metacognition/nine-layer/04-understand/) | 费曼判据：讲不出来就是没懂 |
+| 5 体系 | [第 5 层 · 从「懂一个」到「织成网」](/metacognition/nine-layer/05-system/) | 知识散点怎么变成网络 |
+| 6 应用 | [第 6 层 · 从「我懂」到「我能解决」](/metacognition/nine-layer/06-apply/) | 惰性知识怎么激活 |
+| 7 思辨 | [第 7 层 · 从「会用」到「会判断」](/metacognition/nine-layer/07-critique/) | 怎么说出边界 + 反例 |
+| 8 创新 | [第 8 层 · 从「会判断」到「能创造」](/metacognition/nine-layer/08-create/) | 跨域组合怎么稳定产出 |
+| 9 内化 | [第 9 层 · 从「能创造」到「成为自己」](/metacognition/nine-layer/09-internalize/) | 30 天行为实验怎么做 |
+
+> 💡 **读者使用指南**：初中生/高中生 → 先读入门篇 + 每篇行动卡；大学生 → 全系列通读，重点 4-7 层；职场人 → 重点 6-9 层（应用/思辨/创新/内化）。
 
 ---
 

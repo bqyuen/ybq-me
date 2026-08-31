@@ -25,6 +25,9 @@ layout: "list"
 ### 📂 当前内容
 
 - **[知识的九重境界](/metacognition/nine-layer-model/)**——从"翻书"到"内化到行为"的九层路径，帮你判断知识在哪一层（元认知知识·任务维度）
+- **《九重知识体系》实操系列**（每层独立实操篇）：
+  - [入门篇 · 接触→浏览→记忆](/metacognition/nine-layer/01-receive/) · [第4层·理解](/metacognition/nine-layer/04-understand/) · [第5层·体系](/metacognition/nine-layer/05-system/)
+  - [第6层·应用](/metacognition/nine-layer/06-apply/) · [第7层·思辨](/metacognition/nine-layer/07-critique/) · [第8层·创新](/metacognition/nine-layer/08-create/) · [第9层·内化](/metacognition/nine-layer/09-internalize/)
 - **[敏感的力量](/metacognition/sensitive-power/)**——你以为的缺陷，其实是持续 20 年的高强度训练（自我觉察·感知层）
 
 ---
