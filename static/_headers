@@ -3,7 +3,9 @@
 # 参考：https://developers.cloudflare.com/pages/configuration/headers/
 
 # ============= 全站基础安全头 =============
-/
+# 注意：Cloudflare Pages 的 _headers 路径按 glob 匹配，'/ ' 仅匹配根路径，
+# 必须用 '/*' 才能覆盖全站所有路径（含子目录/内容页/标签页）。
+/*
   # 防 MIME 嗅探（已有，重复声明保证 100% 命中）
   X-Content-Type-Options: nosniff
   # 防点击劫持 - 允许同源 iframe（ai-assistant 内嵌面板）
