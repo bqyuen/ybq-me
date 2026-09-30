@@ -43,13 +43,10 @@ jobs:
         run: hugo --minify --gc --cleanDestinationDir
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        # cloudflare/pages-action@v1 已下线（无法 resolve），改用官方替代 wrangler-action@v3
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: e05beded5b02f2e211033aa57096a5fd
-          projectName: ybq-me
-          directory: public
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          # 可选：自动处理 PR 预览
-          # wranglerVersion: '3'
-          # deploymentEnv: production
+          command: pages deploy public --project-name=ybq-me --branch=main
